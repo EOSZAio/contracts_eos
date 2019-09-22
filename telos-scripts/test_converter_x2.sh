@@ -21,35 +21,49 @@ NC='\033[0m'
 
 echo
 echo -e "${CYAN}------------------------PREPARE PARAMETERS-----------------------${NC}"
-read -p "Converter code (${1})  : " CONVERTER_CODE
-read -p "Token symbol (${3})   : " SYMBOL
-read -p "Presision (${2})  : " PRESISION
+read -p "Converter 1 code (${1}) : " CONVERTER_CODE1
+read -p "Token 1 symbol (${3})  : " SYMBOL1
+read -p "Presision 1 (${2}) : " PRESISION1
+
+read -p "Converter 2 code (${1}) : " CONVERTER_CODE2
+read -p "Token 2 symbol (${3})  : " SYMBOL2
+read -p "Presision 2 (${2}) : " PRESISION2
+
 
 echo
 TOKEN=stablecoin.z
 NRTWORK="network.tbn"
-CONVERTER="${CONVERTER_CODE}.tbn"
-RELAY="${CONVERTER_CODE}relay.tbn"
-ISSUER="${CONVERTER_CODE}tknissuer"
 NETWORK_TOKEN=TLOS
-SMART_TOKEN=${NETWORK_TOKEN}$(echo $CONVERTER_CODE | tr '[a-z]' '[A-Z]')
+
+CONVERTER1="${CONVERTER_CODE1}.tbn"
+RELAY1="${CONVERTER_CODE1}relay.tbn"
+#ISSUER1="${CONVERTER_CODE1}tknissuer"
+#SMART_TOKEN=${NETWORK_TOKEN}$(echo $CONVERTER_CODE | tr '[a-z]' '[A-Z]')
+
+CONVERTER2="${CONVERTER_CODE2}.tbn"
+RELAY2="${CONVERTER_CODE2}relay.tbn"
+#ISSUER2="${CONVERTER_CODE2}tknissuer"
 
 echo
-read -p "TLOS amount      : " TLOS_AMOUNT
-read -p "${SYMBOL} amount      : " TOKEN_AMOUNT
-read -p "${SMART_TOKEN} amount   : " SMART_AMOUNT
+read -p "${SYMBOL1} amount      : " TOKEN_AMOUNT1
+read -p "${SYMBOL2} amount      : " TOKEN_AMOUNT2
+#read -p "${SMART_TOKEN} amount   : " SMART_AMOUNT
 
 echo
 read -p "Command (cleos)   : " COMMAND
 
 echo
-echo "Token       : ${TOKEN}"
-echo "Symbol      : ${SYMBOL}"
-echo "Presision   : ${PRESISION}"
-echo "Converter   : ${CONVERTER}"
-echo "Relay       : ${RELAY}"
-echo "Issuer      : ${ISSUER}"
-echo "Smart token : ${SMART_TOKEN}"
+echo "Token         : ${TOKEN}"
+echo "Symbol 1      : ${SYMBOL1}"
+echo "Presision 1   : ${PRESISION1}"
+echo "Converter 1   : ${CONVERTER1}"
+#echo "Relay 1       : ${RELAY1}"
+#echo "Issuer 1      : ${ISSUER1}"
+#echo "Smart token 1 : ${SMART_TOKEN1}"
+
+echo "Symbol 2      : ${SYMBOL2}"
+echo "Presision 2   : ${PRESISION2}"
+echo "Converter 2   : ${CONVERTER2}"
 
 echo
 echo echo "Command     : ${COMMAND}"
@@ -131,27 +145,18 @@ $COMMAND wallet import --private-key $STABLE_PRV
 echo
 echo
 sleep 1
-echo -e "${CYAN}-----trying to sell relays with 'smart_enabled' set to true-------${NC}"
-echo -e "${CYAN}----------------------should not throw (TLOS)---------------------${NC}"
-echo
-echo -e "${CYAN}---------------------------${SMART_TOKEN}=>TLOS---------------------------${NC}"
-
-$COMMAND push action $RELAY transfer '["admin.tbn","'${NRTWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
+echo -e "${CYAN}----------------------------${SYMBOL1}=>${SYMBOL2}-----------------------------${NC}"
+$COMMAND push action $TOKEN transfer '["admin.tbn","'${NRTWORK}'","'${TOKEN_AMOUNT1}' '${SYMBOL1}'","1,'${CONVERTER1}' TLOS '${CONVERTER2}' '${SYMBOL2}',0.0,admin.tbn"]' -p admin.tbn@active
 
 echo
 sleep 1
-echo -e "${CYAN}---------------------------'${SMART_TOKEN}'=>${SYMBOL}---------------------------${NC}"
-$COMMAND push action $RELAY transfer '["admin.tbn","'${NRTWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' '${SYMBOL}',0.00000010,admin.tbn"]' -p admin.tbn@active
+echo -e "${CYAN}----------------------------${SYMBOL2}=>${SYMBOL1}-----------------------------${NC}"
+$COMMAND push action $TOKEN transfer '["admin.tbn","'${NRTWORK}'","'${TOKEN_AMOUNT2}' '${SYMBOL2}'","1,'${CONVERTER2}' TLOS '${CONVERTER1}' '${SYMBOL1}',0.0,admin.tbn"]' -p admin.tbn@active
 
-echo
-sleep 1
-echo -e "${CYAN}----------------------------TLOS=>${SYMBOL}-----------------------------${NC}"
-$COMMAND push action eosio.token transfer '["admin.tbn","'${NRTWORK}'","'${TLOS_AMOUNT}' TLOS","1,'${CONVERTER}' '${SYMBOL}',0.0,admin.tbn"]' -p admin.tbn@active
-
-echo
-sleep 1
-echo -e "${CYAN}----------------------------${SYMBOL}=>TLOS-----------------------------${NC}"
-$COMMAND push action stablecoin.z transfer '["admin.tbn","'${NRTWORK}'","'${TOKEN_AMOUNT}' '${SYMBOL}'","1,'${CONVERTER}' TLOS,0.0,admin.tbn"]' -p admin.tbn@active
+#echo
+#sleep 1
+#echo -e "${CYAN}----------------------------${SYMBOL}=>TLOS-----------------------------${NC}"
+#$COMMAND push action $TOKEN transfer '["admin.tbn","'${NRTWORK}'","'${TOKEN_AMOUNT2}' '${SYMBOL2}'","1,'${CONVERTER2}' TLOS '${CONVERTER1}' '${SYMBOL1}' '${CONVERTER1}' TLOS,0.0,admin.tbn"]' -p admin.tbn@active
 
 echo
 
