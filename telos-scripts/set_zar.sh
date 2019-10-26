@@ -131,8 +131,8 @@ echo -e "${CYAN}--------------setup converters and transfer tokens--------------
 cleos push action zar.tbn init '["zarrelay.tbn", "0.00000000 TLOSZAR", 0, 1, "network.tbn", 0, 30000, 0]' -p zar.tbn@active
 
 #    set reserves eos and bnt for bntzar relay
-cleos push action zar.tbn setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p zar.tbn@active
-cleos push action zar.tbn setreserve '["stablecoin.z", "0.00 EZAR", 500000, 1]' -p zar.tbn@active
+cleos push action zar.tbn setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p zar.tbn@active
+cleos push action zar.tbn setreserve '["stablecoin.z", "2,EZAR", 500000, 1]' -p zar.tbn@active
 
 echo
 sleep 1
@@ -144,7 +144,6 @@ echo
 sleep 1
 echo -e "${CYAN}--------------transfer TLOS to user1 and converters---------------${NC}"
 cleos push action eosio.token transfer '["eosio","admin.tbn","200000.0000 TLOS","setup"]' -p eosio@active
-
 cleos push action eosio.token transfer '["admin.tbn","zar.tbn","100000.0000 TLOS","setup"]' -p admin.tbn@active
 
 echo

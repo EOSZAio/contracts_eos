@@ -13,35 +13,11 @@
             "base": "",
             "fields": [
                 {
-                    "name": "smart_contract",
-                    "type": "name"
-                },
-                {
-                    "name": "smart_currency",
-                    "type": "asset"
-                },
-                {
-                    "name": "smart_enabled",
-                    "type": "bool"
-                },
-                {
                     "name": "enabled",
                     "type": "bool"
                 },
                 {
-                    "name": "network",
-                    "type": "name"
-                },
-                {
-                    "name": "require_balance",
-                    "type": "bool"
-                },
-                {
                     "name": "max_fee",
-                    "type": "uint64"
-                },
-                {
-                    "name": "fee",
                     "type": "uint64"
                 }
             ]
