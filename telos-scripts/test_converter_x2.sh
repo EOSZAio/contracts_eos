@@ -32,7 +32,7 @@ read -p "Presision 2 (${2}) : " PRESISION2
 
 echo
 TOKEN=stablecoin.z
-NRTWORK="network.tbn"
+NRTWORK="bancor.tbn"
 NETWORK_TOKEN=TLOS
 
 CONVERTER1="${CONVERTER_CODE1}.tbn"

@@ -25,8 +25,10 @@ echo -e "${CYAN}------------------------PREPARE PARAMETERS----------------------
 read -p "Converter code (${1})  : " CONVERTER_CODE
 read -p "Token symbol (${4})   : " SYMBOL
 read -p "Max supply (${2}) : " MAX_SUPPLY
-read -p "Presision (${3})  : " PRESISION
+read -p "Presision (${3})  : " PRESISIONSTR
 read -p "Fee (0)           : " FEE
+
+PRESISION=${#PRESISIONSTR}
 
 echo
 echo "Liquidity"
@@ -39,7 +41,7 @@ read -p "Command (cleos)   : " COMMAND
 
 echo
 TOKEN=stablecoin.z
-NRTWORK="network.tbn"
+NETWORK="bancor.tbn"
 CONVERTER="${CONVERTER_CODE}.tbn"
 RELAY="${CONVERTER_CODE}relay.tbn"
 ISSUER="${CONVERTER_CODE}tknissuer"
@@ -54,13 +56,14 @@ echo "Converter   : ${CONVERTER}"
 echo "Relay       : ${RELAY}"
 echo "Issuer      : ${ISSUER}"
 echo "Smart token : ${SMART_TOKEN}"
+echo "Network     : ${NETWORK}"
 
 echo
-echo "TLOS liquidity : ${TLOS_LIQUIDITY}"
-echo "${SYMBOL} liquidity : ${TOKEN_LIQUIDITY}"
+echo "TLOS liquidity    : ${TLOS_LIQUIDITY}"
+echo "${SYMBOL} liquidity    : ${TOKEN_LIQUIDITY}"
 echo "${SMART_TOKEN} liquidity : ${SMART_LIQUIDITY}"
 
-echo echo "Command     : ${COMMAND}"
+echo echo "Command      : ${COMMAND}"
 
 echo
 read -p "Continue?"
@@ -165,8 +168,8 @@ echo
 read -p "Continue?"
 echo -e "${CYAN}---------------------------ISSUE TOKENS--------------------------${NC}"
 #    create and issue $SYMBOL token
-$COMMAND push action $TOKEN create '["'${ISSUER}'", "'${MAX_SUPPLY}'.'${PRESISION}' '${SYMBOL}'"]' -p $TOKEN@active
-$COMMAND push action $TOKEN issue  '["'${ISSUER}'", "1000000.'${PRESISION}' '${SYMBOL}'", "setup"]' -p $ISSUER@active
+$COMMAND push action $TOKEN create '["'${ISSUER}'", "'${MAX_SUPPLY}'.'${PRESISIONSTR}' '${SYMBOL}'"]' -p $TOKEN@active
+$COMMAND push action $TOKEN issue  '["'${ISSUER}'", "1000000.'${PRESISIONSTR}' '${SYMBOL}'", "setup"]' -p $ISSUER@active
 
 #    create and issue relay token - $SMART_TOKEN
 $COMMAND push action $RELAY create '["'${CONVERTER}'", "250000000.00000000 '${SMART_TOKEN}'"]' -p $RELAY@active
@@ -176,16 +179,16 @@ echo
 read -p "Continue?"
 echo -e "${CYAN}--------------setup converters and transfer tokens---------------${NC}"
 #    initialize the converters
-$COMMAND push action $CONVERTER init '["'${RELAY}'", "0.00000000 '${SMART_TOKEN}'", 0, 1, "'${NRTWORK}'", 0, 30000, '${FEE}']' -p $CONVERTER@active
+$COMMAND push action $CONVERTER init '["'${RELAY}'", "0.00000000 '${SMART_TOKEN}'", 0, 1, "'${NETWORK}'", 0, 30000, '${FEE}']' -p $CONVERTER@active
 
 #    set reserves xxx and TLOS for bntxxx relay
-$COMMAND push action $CONVERTER setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p $CONVERTER@active
-$COMMAND push action $CONVERTER setreserve '["'${TOKEN}'", "0.'${PRESISION}' '${SYMBOL}'", 500000, 1]' -p $CONVERTER@active
+$COMMAND push action $CONVERTER setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p $CONVERTER@active
+$COMMAND push action $CONVERTER setreserve '["'${TOKEN}'", "'${PRESISION}','${SYMBOL}'", 500000, 1]' -p $CONVERTER@active
 
 echo
 read -p "Continue?"
 echo -e "${CYAN}-------------transfer $SYMBOL to admin.tbn and converter------------${NC}"
-$COMMAND push action $TOKEN transfer '["'${ISSUER}'","admin.tbn","1000.'${PRESISION}' '${SYMBOL}'","setup"]' -p $ISSUER@active
+$COMMAND push action $TOKEN transfer '["'${ISSUER}'","admin.tbn","1000.'${PRESISIONSTR}' '${SYMBOL}'","setup"]' -p $ISSUER@active
 $COMMAND push action $TOKEN transfer '["'${ISSUER}'","'${CONVERTER}'","'${TOKEN_LIQUIDITY}' '${SYMBOL}'","setup"]' -p $ISSUER@active
 
 echo

@@ -173,7 +173,7 @@ sleep 1
 #cleos system newaccount eosio reporter4 $REP_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 10 --transfer
 
 #cleos system newaccount eosio bancorxoneos $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 500 --transfer
-cleos system newaccount eosio network.tbn  $NET_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 200 --transfer
+cleos system newaccount eosio bancor.tbn  $NET_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 200 --transfer
 #cleos system newaccount eosio bntbntbntbnt $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 300 --transfer
 #cleos system newaccount eosio bntxrerouter $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 100 --transfer
 
@@ -210,7 +210,7 @@ echo -e "${CYAN}-----------------------DEPLOYING CONTRACTS----------------------
 #cleos set contract fakeos $EOSIO_CONTRACTS_ROOT/eosio.token/
 
 #cleos set contract bntxrerouter $MY_CONTRACTS_BUILD/XTransferRerouter
-cleos set contract network.tbn $MY_CONTRACTS_BUILD/BancorNetwork
+cleos set contract bancor.tbn $MY_CONTRACTS_BUILD/BancorNetwork
 #cleos set contract bancorxoneos $MY_CONTRACTS_BUILD/BancorX
 cleos set contract stablecoin.z $MY_CONTRACTS_BUILD/Token
 
@@ -225,7 +225,7 @@ echo
 echo -e "${CYAN}-------------------------SET PERMISSIONS-------------------------${NC}"
 
 #cleos set account permission bntxrerouter active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bntxrerouter","permission":"eosio.code" }, "weight":1 }] }' owner -p bntxrerouter
-cleos set account permission network.tbn active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"network.tbn","permission":"eosio.code" }, "weight":1 }] }' owner -p network.tbn
+cleos set account permission bancor.tbn active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bancor.tbn","permission":"eosio.code" }, "weight":1 }] }' owner -p bancor.tbn
 #cleos set account permission bancorxoneos active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bancorxoneos","permission":"eosio.code" }, "weight":1 }] }' owner -p bancorxoneos
 #cleos set account permission bntbntbntbnt active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bntbntbntbnt","permission":"eosio.code" }, "weight":1 }] }' owner -p bntbntbntbnt
 
@@ -269,22 +269,22 @@ echo
 sleep 1
 echo -e "${CYAN}--------------setup converters and transfer tokens---------------${NC}"
 #    initialize the converters
-cleos push action zar.tbn init '["zarrelay.tbn", "0.00000000 TLOSZAR", 0, 1, "network.tbn", 0, 30000, 0]' -p zar.tbn@active
-#cleos push action ksh.tbn init '["bnt2kshrelay", "0.00000000 BNTEKSH", 0, 1, "network.tbn", 0, 30000, 0]' -p ksh.tbn@active
-#cleos push action bnt2btccnvrt init '["bnt2btcrelay", "0.00000000 TLOSBTC", 0, 1, "network.tbn", 0, 30000, 0]' -p bnt2btccnvrt@active
+cleos push action zar.tbn init '["zarrelay.tbn", "0.00000000 TLOSZAR", 0, 1, "bancor.tbn", 0, 30000, 0]' -p zar.tbn@active
+#cleos push action ksh.tbn init '["bnt2kshrelay", "0.00000000 BNTEKSH", 0, 1, "bancor.tbn", 0, 30000, 0]' -p ksh.tbn@active
+#cleos push action bnt2btccnvrt init '["bnt2btcrelay", "0.00000000 TLOSBTC", 0, 1, "bancor.tbn", 0, 30000, 0]' -p bnt2btccnvrt@active
 
 #    set reserves eos and bnt for bntzar relay
-cleos push action zar.tbn setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p zar.tbn@active
-cleos push action zar.tbn setreserve '["stablecoin.z", "0.00 EZAR", 500000, 1]' -p zar.tbn@active
+cleos push action zar.tbn setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p zar.tbn@active
+cleos push action zar.tbn setreserve '["stablecoin.z", "2,EZAR", 500000, 1]' -p zar.tbn@active
 
 #    set reserves eos and bnt for bntksh relay
-#cleos push action ksh.tbn setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p ksh.tbn@active
-#cleos push action ksh.tbn setreserve '["stablecoin.z", "0.00 EKSH", 500000, 1]' -p ksh.tbn@active
+#cleos push action ksh.tbn setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p ksh.tbn@active
+#cleos push action ksh.tbn setreserve '["stablecoin.z", "2,EKSH", 500000, 1]' -p ksh.tbn@active
 
 #    set reserves eos and bnt for bntbtc relay
-#cleos push action bnt2btccnvrt setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p bnt2btccnvrt@active
-#cleos push action bnt2btccnvrt setreserve '["stablecoin.z", "0.00000000 BTC", 500000, 1]' -p bnt2btccnvrt@active
-#cleos push action bnt2btccnvrt setreserve '["stablecoin.z", "0.00 EZAR", 333333, 1]' -p bnt2btccnvrt@active
+#cleos push action bnt2btccnvrt setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p bnt2btccnvrt@active
+#cleos push action bnt2btccnvrt setreserve '["stablecoin.z", "8,BTC", 500000, 1]' -p bnt2btccnvrt@active
+#cleos push action bnt2btccnvrt setreserve '["stablecoin.z", "2,EZAR", 333333, 1]' -p bnt2btccnvrt@active
 
 echo
 sleep 1
@@ -332,24 +332,24 @@ sleep 1
 echo -e "${CYAN}-----trying to sell relays with 'smart_enabled' set to true-------${NC}"
 echo -e "${CYAN}----------------------should not throw (TLOS)---------------------${NC}"
 echo -e "${CYAN}---------------------------TLOSZAR=>TLOS---------------------------${NC}"
-cleos push action zarrelay.tbn transfer '["admin.tbn","network.tbn","1.00000000 TLOSZAR","1,zar.tbn TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
+cleos push action zarrelay.tbn transfer '["admin.tbn","bancor.tbn","1.00000000 TLOSZAR","1,zar.tbn TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
 echo -e "${CYAN}---------------------------TLOSZAR=>EZAR---------------------------${NC}"
-cleos push action zarrelay.tbn transfer '["admin.tbn","network.tbn","1.00000000 TLOSZAR","1,zar.tbn EZAR,0.00000010,admin.tbn"]' -p admin.tbn@active
+cleos push action zarrelay.tbn transfer '["admin.tbn","bancor.tbn","1.00000000 TLOSZAR","1,zar.tbn EZAR,0.00000010,admin.tbn"]' -p admin.tbn@active
 
 #echo
 #sleep 1
 #echo -e "${CYAN}-----trying to buy relays with 'smart_enabled' set to true-------${NC}"
 #echo -e "${CYAN}----------------------should not throw (TLOS)---------------------${NC}"
 #echo -e "${CYAN}---------------------------TLOS=>TLOSZAR---------------------------${NC}"
-#cleos push action eosio.token transfer '["admin.tbn","network.tbn","1.0000 TLOS","1,zar.tbn TLOSZAR,0.0001,admin.tbn"]' -p admin.tbn@active
+#cleos push action eosio.token transfer '["admin.tbn","bancor.tbn","1.0000 TLOS","1,zar.tbn TLOSZAR,0.0001,admin.tbn"]' -p admin.tbn@active
 #echo -e "${CYAN}---------------------------EZAR=>TLOSZAR---------------------------${NC}"
-#cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","1.00 EZAR","1,zar.tbn TLOSZAR,0.01,admin.tbn"]' -p admin.tbn@active
+#cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","1.00 EZAR","1,zar.tbn TLOSZAR,0.01,admin.tbn"]' -p admin.tbn@active
 
 #echo
 #sleep 1
 #echo -e "${CYAN}------------------------update fee for SYS------------------------${NC}"
 #cleos push action bnt2eoscnvrt update '[1, 1, 0, 10000]' -p bnt2eoscnvrt@active
-#cleos push action bnt2eosrelay transfer '["admin.tbn","network.tbn","0.00100000 BNTTLOS","1,bnt2eoscnvrt TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
+#cleos push action bnt2eosrelay transfer '["admin.tbn","bancor.tbn","0.00100000 BNTTLOS","1,bnt2eoscnvrt TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
 
 #echo
 #sleep 1
@@ -360,41 +360,41 @@ cleos push action zarrelay.tbn transfer '["admin.tbn","network.tbn","1.00000000 
 #sleep 1
 #echo -e "${CYAN}--------------------update bnt2eos with staking-------------------${NC}"
 #cleos push action bnt2eoscnvrt update '[1, 1, 0, 0]' -p bnt2eoscnvrt@active
-#cleos push action eosio.token transfer '["admin.tbn","network.tbn","1.0000 TLOS","1,bnt2eoscnvrt BNTTLOS,0.00000001,admin.tbn"]' -p admin.tbn@active
+#cleos push action eosio.token transfer '["admin.tbn","bancor.tbn","1.0000 TLOS","1,bnt2eoscnvrt BNTTLOS,0.00000001,admin.tbn"]' -p admin.tbn@active
 
 echo
 sleep 1
 echo -e "${CYAN}----------------------------TLOS=>EZAR-----------------------------${NC}"
-cleos push action eosio.token transfer '["admin.tbn","network.tbn","1.0000 TLOS","1,zar.tbn EZAR,0.01,admin.tbn"]' -p admin.tbn@active
+cleos push action eosio.token transfer '["admin.tbn","bancor.tbn","1.0000 TLOS","1,zar.tbn EZAR,0.01,admin.tbn"]' -p admin.tbn@active
 echo -e "${CYAN}----------------------------EZAR=>TLOS-----------------------------${NC}"
-cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","0.01 EZAR","1,zar.tbn TLOS,0.0001,admin.tbn"]' -p admin.tbn@active
+cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","0.01 EZAR","1,zar.tbn TLOS,0.0001,admin.tbn"]' -p admin.tbn@active
 
 #echo
 #sleep 1
 #echo -e "${CYAN}----------------------------TLOS=>EKSH-----------------------------${NC}"
-#cleos push action eosio.token transfer '["admin.tbn","network.tbn","1.0000 TLOS","1,bnt2kshcnvrt EKSH,0.0001,admin.tbn"]' -p admin.tbn@active
+#cleos push action eosio.token transfer '["admin.tbn","bancor.tbn","1.0000 TLOS","1,bnt2kshcnvrt EKSH,0.0001,admin.tbn"]' -p admin.tbn@active
 #echo -e "${CYAN}----------------------------EKSH=>TLOS-----------------------------${NC}"
-#cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","1.00 EKSH","1,bnt2kshcnvrt TLOS,0.00000001,admin.tbn"]' -p admin.tbn@active
+#cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","1.00 EKSH","1,bnt2kshcnvrt TLOS,0.00000001,admin.tbn"]' -p admin.tbn@active
 
 #echo
 #sleep 1
 #echo -e "${CYAN}----------------------------TLOS=>BTC------------------------------${NC}"
-#cleos push action eosio.token transfer '["admin.tbn","network.tbn","1.0000 TLOS","1,bnt2btccnvrt BTC,0.00000001,admin.tbn"]' -p admin.tbn@active
+#cleos push action eosio.token transfer '["admin.tbn","bancor.tbn","1.0000 TLOS","1,bnt2btccnvrt BTC,0.00000001,admin.tbn"]' -p admin.tbn@active
 #echo -e "${CYAN}----------------------------BTC=>TLOS------------------------------${NC}"
-#cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","0.00007896 BTC","1,bnt2btccnvrt TLOS,0.00000001,admin.tbn"]' -p admin.tbn@active
+#cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","0.00007896 BTC","1,bnt2btccnvrt TLOS,0.00000001,admin.tbn"]' -p admin.tbn@active
 #echo -e "${CYAN}##################################################################${NC}"
 #echo -e "${CYAN}---------------------------EZAR=>BTC------------------------------${NC}"
-#cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","1.00 EZAR","1,bnt2btccnvrt BTC,0.00000001,admin.tbn"]' -p admin.tbn@active
+#cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","1.00 EZAR","1,bnt2btccnvrt BTC,0.00000001,admin.tbn"]' -p admin.tbn@active
 #echo -e "${CYAN}----------------------------BTC=>TLOS------------------------------${NC}"
-#cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","0.00000661 BTC","1,bnt2btccnvrt EZAR,0.00000001,admin.tbn"]' -p admin.tbn@active
+#cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","0.00000661 BTC","1,bnt2btccnvrt EZAR,0.00000001,admin.tbn"]' -p admin.tbn@active
 
 #echo
 #sleep 1
 #echo -e "${CYAN}----------------------------EZAR=>EKSH----------------------------${NC}"
-#cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","1000.00 EZAR","1,zar.tbn TLOS bnt2kshcnvrt EKSH,0.0001,admin.tbn"]' -p admin.tbn@active
+#cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","1000.00 EZAR","1,zar.tbn TLOS bnt2kshcnvrt EKSH,0.0001,admin.tbn"]' -p admin.tbn@active
 
 #echo -e "${CYAN}----------------------------EKSH=>EZAR-----------------------------${NC}"
-#cleos push action stablecoin.z transfer '["admin.tbn","network.tbn","6910.34 EKSH","1,bnt2kshcnvrt TLOS zar.tbn EZAR,0.0001,admin.tbn"]' -p admin.tbn@active
+#cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","6910.34 EKSH","1,bnt2kshcnvrt TLOS zar.tbn EZAR,0.0001,admin.tbn"]' -p admin.tbn@active
 
 
 

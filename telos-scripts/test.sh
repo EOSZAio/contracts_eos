@@ -279,12 +279,12 @@ cleos push action bnt2eoscnvrt init '["bnt2eosrelay", "0.00000000 BNTTLOS", 0, 1
 cleos push action bnt2syscnvrt init '["bnt2sysrelay", "0.00000000 BNTSYS", 0, 1, "thisisbancor", 0, 30000, 0]' -p bnt2syscnvrt@active
 
 #    set reserves eos and bnt for bnteos relay
-cleos push action  bnt2eoscnvrt setreserve '["bntbntbntbnt", "0.00000000 BNT", 500000, 1]' -p bnt2eoscnvrt@active
-cleos push action  bnt2eoscnvrt setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p bnt2eoscnvrt@active
+cleos push action  bnt2eoscnvrt setreserve '["bntbntbntbnt", "8,BNT", 500000, 1]' -p bnt2eoscnvrt@active
+cleos push action  bnt2eoscnvrt setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p bnt2eoscnvrt@active
 
 #    set reserves eos and bnt for BNTfakeSYS relay
-cleos push action  bnt2syscnvrt setreserve '["bntbntbntbnt", "0.00000000 BNT", 500000, 1]' -p bnt2syscnvrt@active
-cleos push action  bnt2syscnvrt setreserve '["eosio.token", "0.0000 SYS", 500000, 1]' -p bnt2syscnvrt@active
+cleos push action  bnt2syscnvrt setreserve '["bntbntbntbnt", "8,BNT", 500000, 1]' -p bnt2syscnvrt@active
+cleos push action  bnt2syscnvrt setreserve '["eosio.token", "4,SYS", 500000, 1]' -p bnt2syscnvrt@active
 
 echo
 sleep 1
@@ -457,16 +457,16 @@ cleos push action bnt2kshcnvrt init '["bnt2kshrelay", "0.00000000 BNTEKSH", 0, 1
 cleos push action bnt2btccnvrt init '["bnt2btcrelay", "0.00000000 BNTBTC", 0, 1, "thisisbancor", 0, 30000, 0]' -p bnt2btccnvrt@active
 
 #    set reserves eos and bnt for bntzar relay
-cleos push action bnt2zarcnvrt setreserve '["bntbntbntbnt", "0.00000000 BNT", 500000, 1]' -p bnt2zarcnvrt@active
-cleos push action bnt2zarcnvrt setreserve '["stablecoin.z", "0.00 EZAR", 500000, 1]' -p bnt2zarcnvrt@active
+cleos push action bnt2zarcnvrt setreserve '["bntbntbntbnt", "8,BNT", 500000, 1]' -p bnt2zarcnvrt@active
+cleos push action bnt2zarcnvrt setreserve '["stablecoin.z", "2,EZAR", 500000, 1]' -p bnt2zarcnvrt@active
 
 #    set reserves eos and bnt for bntksh relay
-cleos push action bnt2kshcnvrt setreserve '["bntbntbntbnt", "0.00000000 BNT", 500000, 1]' -p bnt2kshcnvrt@active
-cleos push action bnt2kshcnvrt setreserve '["stablecoin.z", "0.00 EKSH", 500000, 1]' -p bnt2kshcnvrt@active
+cleos push action bnt2kshcnvrt setreserve '["bntbntbntbnt", "8,BNT", 500000, 1]' -p bnt2kshcnvrt@active
+cleos push action bnt2kshcnvrt setreserve '["stablecoin.z", "2,EKSH", 500000, 1]' -p bnt2kshcnvrt@active
 
 #    set reserves eos and bnt for bntbtc relay
-cleos push action bnt2btccnvrt setreserve '["bntbntbntbnt", "0.00000000 BNT", 500000, 1]' -p bnt2btccnvrt@active
-cleos push action bnt2btccnvrt setreserve '["stablecoin.z", "0.00000000 BTC", 500000, 1]' -p bnt2btccnvrt@active
+cleos push action bnt2btccnvrt setreserve '["bntbntbntbnt", "8,BNT", 500000, 1]' -p bnt2btccnvrt@active
+cleos push action bnt2btccnvrt setreserve '["stablecoin.z", "8,BTC", 500000, 1]' -p bnt2btccnvrt@active
 #cleos push action bnt2btccnvrt setreserve '["stablecoin.z", "0.00 EZAR", 333333, 1]' -p bnt2btccnvrt@active
 
 echo

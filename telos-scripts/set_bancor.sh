@@ -141,7 +141,7 @@ echo -e "${CYAN}-----------------------CONTRACTS ACCOUNTS-----------------------
 #cleos system newaccount eosio reporter4 $REP_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 10 --transfer
 
 #cleos system newaccount eosio bancorxoneos $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 500 --transfer
-cleos system newaccount eosio network.tbn  $NET_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 200 --transfer
+cleos system newaccount eosio bancor.tbn  $NET_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 200 --transfer
 #cleos system newaccount eosio bntbntbntbnt $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 300 --transfer
 #cleos system newaccount eosio bntxrerouter $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 100 --transfer
 
@@ -151,13 +151,13 @@ echo
 sleep 1
 echo -e "${CYAN}-----------------------DEPLOYING CONTRACTS-----------------------${NC}"
 #cleos set contract bntxrerouter $MY_CONTRACTS_BUILD/XTransferRerouter
-cleos set contract network.tbn $MY_CONTRACTS_BUILD/BancorNetwork
+cleos set contract bancor.tbn $MY_CONTRACTS_BUILD/BancorNetwork
 #cleos set contract bancorxoneos $MY_CONTRACTS_BUILD/BancorX
 
 echo
 echo -e "${CYAN}-------------------------SET PERMISSIONS-------------------------${NC}"
 #cleos set account permission bntxrerouter active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bntxrerouter","permission":"eosio.code" }, "weight":1 }] }' owner -p bntxrerouter
-cleos set account permission network.tbn active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"network.tbn","permission":"eosio.code" }, "weight":1 }] }' owner -p network.tbn
+cleos set account permission bancor.tbn active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bancor.tbn","permission":"eosio.code" }, "weight":1 }] }' owner -p bancor.tbn
 #cleos set account permission bancorxoneos active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bancorxoneos","permission":"eosio.code" }, "weight":1 }] }' owner -p bancorxoneos
 #cleos set account permission bntbntbntbnt active '{ "threshold": 1, "keys": [{ "key": "EOS8HuvjfQeUS7tMdHPPrkTFMnEP7nr6oivvuJyNcvW9Sx5MxJSkZ", "weight": 1 }], "accounts": [{ "permission": { "actor":"bntbntbntbnt","permission":"eosio.code" }, "weight":1 }] }' owner -p bntbntbntbnt
 

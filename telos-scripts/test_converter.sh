@@ -23,11 +23,13 @@ echo
 echo -e "${CYAN}------------------------PREPARE PARAMETERS-----------------------${NC}"
 read -p "Converter code (${1})  : " CONVERTER_CODE
 read -p "Token symbol (${3})   : " SYMBOL
-read -p "Presision (${2})  : " PRESISION
+read -p "Presision (${2})  : " PRESISIONSTR
+
+PRESISION=${#PRESISIONSTR}
 
 echo
 TOKEN=stablecoin.z
-NETWORK="network.tbn"
+NETWORK="bancor.tbn"
 CONVERTER="${CONVERTER_CODE}.tbn"
 RELAY="${CONVERTER_CODE}relay.tbn"
 ISSUER="${CONVERTER_CODE}tknissuer"
@@ -50,6 +52,7 @@ echo "Converter   : ${CONVERTER}"
 echo "Relay       : ${RELAY}"
 echo "Issuer      : ${ISSUER}"
 echo "Smart token : ${SMART_TOKEN}"
+echo "Network     : ${NETWORK}"
 
 echo
 echo echo "Command     : ${COMMAND}"
