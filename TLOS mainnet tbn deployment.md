@@ -10,9 +10,10 @@ NC='\033[0m'
 
 ### Mainnet
 ```bash
-#API="--url https://api.telos.africa:4443"
+API="--url https://api.telos.africa"
+#API="--url https://history.telos.africa:3443"
 #API="--url https://telos.caleos.io"
-API="--url https://api.telosuk.io"
+#API="--url https://api.telosuk.io"
 OWNER="EOS5oNHb9qY6seSxbNGT3LnRt5EjU97tWmx1GCg73sxc43fR9HPWX"
 ACTIVE="EOS7VbFsbEHiYjB5rYzP2kmVQ8ZjD8m5AapENpqWehCQV4iaCd7cm"
 ```
@@ -49,7 +50,7 @@ SMART_LIQUIDITY=25000.00000000
 FEE=2000
 
 # Fund converter
-cleos $API push action qubicletoken transfer '[ "rorymapstone", "admin.tbn", "18000.0000 TLOS", "Fund Bancor" ]' -p rorymapstone@active
+cleos $API push action qubicletoken transfer '[ "rorymapstone", "admin.tbn", "18000.0000 QBE", "Fund Bancor" ]' -p rorymapstone@active
 
 ```
 
@@ -69,6 +70,42 @@ FEE=2000
 
 # Fund converter
 cleos $API push action $TOKEN transfer '[ "rorymapstone", "admin.tbn", "90000.0000 TLOSDAC", "Fund Bancor" ]' -p rorymapstone@active
+```
+
+### HEART
+```bash
+NETWORK="bancor.tbn"
+NETWORK_TOKEN=TLOS
+TOKEN=revelation21
+CONVERTER_CODE=rev
+SYMBOL=HEART
+PRESISION="0000"
+
+TLOS_LIQUIDITY=10.0000
+TOKEN_LIQUIDITY=10.0000
+SMART_LIQUIDITY=10.00000000
+FEE=2000
+
+# Fund converter
+cleos $API push action eosio.token transfer '[ "admin.tbn", "tbn", "200.0000 TLOS", "Bancor contract accounts" ]' -p admin.tbn@active
+```
+
+### DC
+```bash
+NETWORK="bancor.tbn"
+NETWORK_TOKEN=TLOS
+TOKEN=greencointls
+CONVERTER_CODE=dc
+SYMBOL=DC
+PRESISION="000000"
+
+TLOS_LIQUIDITY=1000.0000
+TOKEN_LIQUIDITY=10.0000
+SMART_LIQUIDITY=1000.00000000
+FEE=12000
+
+# Fund converter
+cleos $API push action eosio.token transfer '[ "admin.tbn", "tbn", "200.0000 TLOS", "Bancor contract accounts" ]' -p admin.tbn@active
 ```
 
 
@@ -102,6 +139,14 @@ cleos $API push action eosio.token transfer '[ "southafrica1", "admin.tbn", "100
 ## Core network accounts
 
 ### admin.tbn
+```bash
+# Admin account 
+cleos $API system newaccount tbn admin.tbn $OWNER $ACTIVE --stake-cpu "0.9000 TLOS" --stake-net "0.1000 TLOS" --buy-ram-kbytes 10 --transfer -p tbn@active
+cleos $API system delegatebw tbn admin.tbn "4.9000 TLOS" "4.1000 TLOS" --transfer -p tbn@active
+cleos $API get account admin.tbn
+```
+
+### funding.tbn
 ```bash
 # Admin account 
 cleos $API system newaccount tbn admin.tbn $OWNER $ACTIVE --stake-cpu "0.9000 TLOS" --stake-net "0.1000 TLOS" --buy-ram-kbytes 10 --transfer -p tbn@active
@@ -190,9 +235,9 @@ cleos $API get currency balance $RELAY $ACCOUNT $SMART_TOKEN
 
 ### Test converter
 ```bash
-SMART_AMOUNT=1.00000000
+SMART_AMOUNT=0.10000000
 TLOS_AMOUNT=0.1000
-TOKEN_AMOUNT=50.0000
+TOKEN_AMOUNT=0.10
 
 # Funding to test
 cleos $API push action eosio.token transfer '[ "tbn", "admin.tbn", "10.0000 TLOS", "Fund Bancor" ]' -p tbn@active
@@ -213,10 +258,10 @@ CONVERTER_CODE1=zar
 SYMBOL1=EZAR
 TOKEN1=stablecoin.z
 
-TOKEN_AMOUNT2=16.7578
-CONVERTER_CODE2=qbe
-SYMBOL2=QBE
-TOKEN2=qubicletoken
+TOKEN_AMOUNT2=10.00
+CONVERTER_CODE2=ksh
+SYMBOL2=EKSH
+TOKEN2=stablecoin.z
 
 CONVERTER1="${CONVERTER_CODE1}.tbn"
 CONVERTER2="${CONVERTER_CODE2}.tbn"
@@ -226,4 +271,59 @@ cleos $API push action $TOKEN1 transfer '["admin.tbn","'${NETWORK}'","'${TOKEN_A
 
 echo -e "${CYAN}----------------------------${SYMBOL2}=>${SYMBOL1}-----------------------------${NC}"
 cleos $API push action $TOKEN2 transfer '["admin.tbn","'${NETWORK}'","'${TOKEN_AMOUNT2}' '${SYMBOL2}'","1,'${CONVERTER2}' TLOS '${CONVERTER1}' '${SYMBOL1}',0.0,admin.tbn"]' -p admin.tbn@active
+```
+
+### All converters
+```bash
+echo
+TOKEN=stablecoin.z
+CONVERTER_CODE=zar
+SYMBOL=EZAR
+
+ACCOUNT="${CONVERTER_CODE}.tbn"
+RELAY="${CONVERTER_CODE}relay.tbn"
+SMART_TOKEN=${NETWORK_TOKEN}$(echo $CONVERTER_CODE | tr '[a-z]' '[A-Z]')
+
+echo -e "${GREEN}${ACCOUNT}${NC}"
+cleos $API get currency balance eosio.token $ACCOUNT TLOS
+cleos $API get currency balance $TOKEN $ACCOUNT $SYMBOL
+cleos $API get currency balance $RELAY $ACCOUNT $SMART_TOKEN
+
+# 992.1301 TLOS
+# 1293.86 EZAR
+
+echo
+TOKEN=telosdacdrop
+CONVERTER_CODE=dac
+SYMBOL=TLOSDAC
+
+ACCOUNT="${CONVERTER_CODE}.tbn"
+RELAY="${CONVERTER_CODE}relay.tbn"
+SMART_TOKEN=${NETWORK_TOKEN}$(echo $CONVERTER_CODE | tr '[a-z]' '[A-Z]')
+
+echo -e "${GREEN}${ACCOUNT}${NC}"
+cleos $API get currency balance eosio.token $ACCOUNT TLOS
+cleos $API get currency balance $TOKEN $ACCOUNT $SYMBOL
+cleos $API get currency balance $RELAY $ACCOUNT $SMART_TOKEN
+
+# 233.7253 TLOS
+# 86656.5962 TLOSDAC
+
+echo
+TOKEN=qubicletoken
+CONVERTER_CODE=qbe
+SYMBOL=QBE
+
+ACCOUNT="${CONVERTER_CODE}.tbn"
+RELAY="${CONVERTER_CODE}relay.tbn"
+SMART_TOKEN=${NETWORK_TOKEN}$(echo $CONVERTER_CODE | tr '[a-z]' '[A-Z]')
+
+echo -e "${GREEN}${ACCOUNT}${NC}"
+cleos $API get currency balance eosio.token $ACCOUNT TLOS
+cleos $API get currency balance $TOKEN $ACCOUNT $SYMBOL
+cleos $API get currency balance $RELAY $ACCOUNT $SMART_TOKEN
+
+# 577.4492 TLOS
+# 12546.8545 QBE
+
 ```

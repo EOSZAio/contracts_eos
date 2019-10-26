@@ -10,7 +10,7 @@ clear
 # KSH  0.0097   845616.49
 
 
-# ./test_converter.sh btc 00000000 EBTC
+# ./test_converter_x2.sh btc 00000000 EBTC
 # Converter code : " btc
 # Token symbol   : " EBTC
 # Presision      : " 00000000

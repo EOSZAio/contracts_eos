@@ -27,7 +27,7 @@ read -p "Presision (${2})  : " PRESISION
 
 echo
 TOKEN=stablecoin.z
-NRTWORK="network.tbn"
+NETWORK="network.tbn"
 CONVERTER="${CONVERTER_CODE}.tbn"
 RELAY="${CONVERTER_CODE}relay.tbn"
 ISSUER="${CONVERTER_CODE}tknissuer"
@@ -136,22 +136,22 @@ echo -e "${CYAN}----------------------should not throw (TLOS)-------------------
 echo
 echo -e "${CYAN}---------------------------${SMART_TOKEN}=>TLOS---------------------------${NC}"
 
-$COMMAND push action $RELAY transfer '["admin.tbn","'${NRTWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
+$COMMAND push action $RELAY transfer '["admin.tbn","'${NETWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
 
 echo
 sleep 1
 echo -e "${CYAN}---------------------------'${SMART_TOKEN}'=>${SYMBOL}---------------------------${NC}"
-$COMMAND push action $RELAY transfer '["admin.tbn","'${NRTWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' '${SYMBOL}',0.00000010,admin.tbn"]' -p admin.tbn@active
+$COMMAND push action $RELAY transfer '["admin.tbn","'${NETWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' '${SYMBOL}',0.00000010,admin.tbn"]' -p admin.tbn@active
 
 echo
 sleep 1
 echo -e "${CYAN}----------------------------TLOS=>${SYMBOL}-----------------------------${NC}"
-$COMMAND push action eosio.token transfer '["admin.tbn","'${NRTWORK}'","'${TLOS_AMOUNT}' TLOS","1,'${CONVERTER}' '${SYMBOL}',0.0,admin.tbn"]' -p admin.tbn@active
+$COMMAND push action eosio.token transfer '["admin.tbn","'${NETWORK}'","'${TLOS_AMOUNT}' TLOS","1,'${CONVERTER}' '${SYMBOL}',0.0,admin.tbn"]' -p admin.tbn@active
 
 echo
 sleep 1
 echo -e "${CYAN}----------------------------${SYMBOL}=>TLOS-----------------------------${NC}"
-$COMMAND push action stablecoin.z transfer '["admin.tbn","'${NRTWORK}'","'${TOKEN_AMOUNT}' '${SYMBOL}'","1,'${CONVERTER}' TLOS,0.0,admin.tbn"]' -p admin.tbn@active
+$COMMAND push action stablecoin.z transfer '["admin.tbn","'${NETWORK}'","'${TOKEN_AMOUNT}' '${SYMBOL}'","1,'${CONVERTER}' TLOS,0.0,admin.tbn"]' -p admin.tbn@active
 
 echo
 

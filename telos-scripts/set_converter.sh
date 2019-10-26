@@ -26,6 +26,7 @@ read -p "Converter code (${1})  : " CONVERTER_CODE
 read -p "Token symbol (${4})   : " SYMBOL
 read -p "Max supply (${2}) : " MAX_SUPPLY
 read -p "Presision (${3})  : " PRESISION
+read -p "Fee (0)           : " FEE
 
 echo
 echo "Liquidity"
@@ -175,7 +176,7 @@ echo
 read -p "Continue?"
 echo -e "${CYAN}--------------setup converters and transfer tokens---------------${NC}"
 #    initialize the converters
-$COMMAND push action $CONVERTER init '["'${RELAY}'", "0.00000000 '${SMART_TOKEN}'", 0, 1, "'${NRTWORK}'", 0, 30000, 0]' -p $CONVERTER@active
+$COMMAND push action $CONVERTER init '["'${RELAY}'", "0.00000000 '${SMART_TOKEN}'", 0, 1, "'${NRTWORK}'", 0, 30000, '${FEE}']' -p $CONVERTER@active
 
 #    set reserves xxx and TLOS for bntxxx relay
 $COMMAND push action $CONVERTER setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p $CONVERTER@active

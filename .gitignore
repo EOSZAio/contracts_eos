@@ -12,3 +12,6 @@ node_modules/
 **/cmake_install.cmake
 .vscode
 
+.idea/
+
+telos-scripts/nodeos/

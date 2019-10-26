@@ -48,11 +48,23 @@ CONTRACT BancorNetwork : public eosio::contract {
         void transfer(name from, name to, asset quantity, string memo);
     
     private:
+//        TABLE settings_t {
+//                bool enabled;
+//                uint64_t max_fee;
+//                EOSLIB_SERIALIZE(settings_t, (enabled)(max_fee))
+//            };
         TABLE settings_t {
-                bool enabled;
-                uint64_t max_fee;
-                EOSLIB_SERIALIZE(settings_t, (enabled)(max_fee))
-            };
+                  name     smart_contract;
+                  asset    smart_currency;
+                  bool     smart_enabled;
+                  bool     enabled;
+                  name     network;
+                  bool     require_balance;
+                  uint64_t max_fee;
+                  uint64_t fee;
+
+                  EOSLIB_SERIALIZE(settings_t, (smart_contract)(smart_currency)(smart_enabled)(enabled)(network)(require_balance)(max_fee)(fee))
+              };
 
         typedef eosio::singleton<"settings"_n, settings_t> settings;
         typedef eosio::multi_index<"settings"_n, settings_t> dummy_for_abi; // hack until abi generator generates correct name

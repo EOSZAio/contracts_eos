@@ -9,13 +9,18 @@
 # Create wallet with command:
 #   cleos wallet create -n testwallet --to-console
 #   [NOTE] record your password somewhere
+#   Password : PW5JdKqyPfeHDUurSiXoBtrF1LdCBeNTWFpsshpw7bpkqrniZ3uqE
 
 # Set ENV vars:
 #   export WALLET="testwallet"
 #   export PASSWORD="{your password here}"
+#   export PASSWORD="PW5JdKqyPfeHDUurSiXoBtrF1LdCBeNTWFpsshpw7bpkqrniZ3uqE"
 
 # In a separate terminal window, run nodeos locally with this exact command:
 #   nodeos -e -p eosio --max-transaction-time=1000 --http-validate-host=false --delete-all-blocks --contracts-console --plugin eosio::chain_api_plugin --plugin eosio::history_api_plugin --plugin eosio::producer_plugin --plugin eosio::http_plugin
+
+# https://github.com/EOSIO/eos/issues/7180
+# curl -X POST http://127.0.0.1:8888/v1/producer/schedule_protocol_feature_activations -d '{"protocol_features_to_activate": ["0ec7e080177b2c02b278d5088611686b49d739925a92d9bfcacd7fc6b74053bd"]}' | jq
 
 #=================================================================================#
 # Config Constants
@@ -25,8 +30,9 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 
 # CHANGE PATH
-EOSIO_CONTRACTS_ROOT=~/eosio.contracts/build
-MY_CONTRACTS_BUILD=~/contracts_eos/build
+EOSIO_CONTRACTS_ROOT=~/eosio.contracts/build/contracts
+#MY_CONTRACTS_BUILD=~/contracts_eos/build
+MY_CONTRACTS_BUILD=~/bancor/contracts/eos
 
 NODEOS_HOST="127.0.0.1"
 NODEOS_PROTOCOL="http"
@@ -97,16 +103,17 @@ cleos create account eosio eosio.saving EOS8ioLmKrCyy5VyZqMNdimSpPjVF2tKbT5WKhE6
 cleos create account eosio eosio.stake EOS5an8bvYFHZBmiCAzAtVSiEiixbJhLY8Uy5Z7cpf3S9UoqA3bJb
 cleos create account eosio eosio.token EOS7JPVyejkbQHzE9Z4HwewNzGss11GB21NPkwTX2MQFmruYFqGXm
 cleos create account eosio eosio.vpay EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+cleos create account eosio eosio.rex EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
 
 
 # Bootstrap new system contracts
 echo -e "${CYAN}-----------------------SYSTEM CONTRACTS-----------------------${NC}"
 cleos set contract eosio.token $EOSIO_CONTRACTS_ROOT/eosio.token/
 cleos set contract eosio.msig $EOSIO_CONTRACTS_ROOT/eosio.msig/
-cleos push action eosio.token create '[ "eosio", "100000000000.0000 EOS" ]' -p eosio.token
+cleos push action eosio.token create '[ "eosio", "100000000000.0000 TLOS" ]' -p eosio.token
 cleos push action eosio.token create '[ "eosio", "100000000000.0000 SYS" ]' -p eosio.token
 echo -e "      EOS TOKEN CREATED"
-cleos push action eosio.token issue '[ "eosio", "10000000000.0000 EOS", "memo" ]' -p eosio
+cleos push action eosio.token issue '[ "eosio", "10000000000.0000 TLOS", "memo" ]' -p eosio
 cleos push action eosio.token issue '[ "eosio", "10000000000.0000 SYS", "memo" ]' -p eosio
 echo -e "      EOS TOKEN ISSUED"
 cleos set contract eosio $EOSIO_CONTRACTS_ROOT/eosio.bios/
@@ -114,13 +121,13 @@ echo -e "      BIOS SET"
 cleos set contract eosio $EOSIO_CONTRACTS_ROOT/eosio.system/
 echo -e "      SYSTEM SET"
 cleos push action eosio setpriv '["eosio.msig", 1]' -p eosio@active
-cleos push action eosio init '[0, "4,EOS"]' -p eosio@active
+cleos push action eosio init '[0, "4,TLOS"]' -p eosio@active
 #cleos push action eosio init '[0, "4,SYS"]' -p eosio@active
 
 # Deploy eosio.wrap
 echo -e "${CYAN}-----------------------EOSIO WRAP-----------------------${NC}"
 cleos wallet import --private-key 5J3JRDhf4JNhzzjEZAsQEgtVuqvsPPdZv4Tm6SjMRx1ZqToaray
-cleos system newaccount eosio eosio.wrap EOS7LpGN1Qz5AbCJmsHzhG7sWEGd9mwhTXWmrYXqxhTknY2fvHQ1A --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio eosio.wrap EOS7LpGN1Qz5AbCJmsHzhG7sWEGd9mwhTXWmrYXqxhTknY2fvHQ1A --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
 cleos push action eosio setpriv '["eosio.wrap", 1]' -p eosio@active
 cleos set contract eosio.wrap $EOSIO_CONTRACTS_ROOT/eosio.wrap/
 
@@ -134,25 +141,25 @@ cleos wallet import --private-key $USR_PRV
 
 # 2) Create accounts
 
-cleos system newaccount eosio reporter1 $REP_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio reporter2 $REP_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio reporter3 $REP_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio reporter4 $REP_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio reporter1 $REP_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio reporter2 $REP_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio reporter3 $REP_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio reporter4 $REP_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
 
-cleos system newaccount eosio bancorxoneos $BNT_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio thisisbancor $BNT_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio bntbntbntbnt $BNT_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio bntxrerouter $BNT_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio bancorxoneos $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio thisisbancor $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio bntbntbntbnt $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio bntxrerouter $BNT_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
 
-cleos system newaccount eosio bnt2eoscnvrt $CON_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio bnt2eosrelay $CON_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio bnt2eoscnvrt $CON_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio bnt2eosrelay $CON_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
 
-cleos system newaccount eosio bnttestuser1 $USR_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio bnttestuser2 $USR_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 5000 --transfer
-cleos system newaccount eosio fakeos $USR_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 50000 --transfer
+cleos system newaccount eosio bnttestuser1 $USR_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio bnttestuser2 $USR_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 5000 --transfer
+cleos system newaccount eosio fakeos $USR_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 50000 --transfer
 
-cleos system newaccount eosio bnt2syscnvrt $USR_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 50000 --transfer
-cleos system newaccount eosio bnt2sysrelay $USR_PUB --stake-cpu "50 SYS" --stake-net "10 SYS" --buy-ram-kbytes 50000 --transfer
+cleos system newaccount eosio bnt2syscnvrt $USR_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 50000 --transfer
+cleos system newaccount eosio bnt2sysrelay $USR_PUB --stake-cpu "50 TLOS" --stake-net "10 TLOS" --buy-ram-kbytes 50000 --transfer
 
 # 3) Deploy contracts
 
