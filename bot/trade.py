@@ -22,6 +22,8 @@ NET_TKN_SYMBOL="TLOS"
 TKN_CONTRACT="stablecoin.z"
 TKN_SYMBOL="EZAR"
 
+# Used to account for local market premium
+PREMIUM=1.0
 TRADE_QUANTITY=5.0
 SPREAD=3.0
 
@@ -62,10 +64,11 @@ bot_net_balance = get_currency_balance('bot.tbn', NET_TKN_CONTRACT, NET_TKN_SYMB
 bot_token_balance = get_currency_balance('bot.tbn', TKN_CONTRACT, TKN_SYMBOL)
 
 bancor_price = float(token_liquidity[0]) / float(net_token_liquidity[0])
-price_delta = (bancor_price - coingecko_price) / coingecko_price * 100.0
+price_delta = (bancor_price - coingecko_price * PREMIUM) / coingecko_price * PREMIUM * 100.0
 
 print('CoinGecho price       : ' + str(coingecko_price))
 print('Bancor price          : ' + str(round(bancor_price, 4)))
+print('Price premium         : ' + str(round(100.0 * (PREMIUM - 1.0), 2)) + '%')
 
 print('\nPrice delta           : ' + str(round(price_delta, 2)) + '%')
 print('Price delta limit     : ' + str(SPREAD/2.0) + '%\n')
@@ -75,8 +78,8 @@ print(NET_TKN_SYMBOL + ' liquidity depth  : ' + net_token_liquidity[0] + ' ' + n
 print('bot.tbn ' + TKN_SYMBOL + ' balance  : ' + bot_token_balance[0] + ' ' + bot_token_balance[1])
 print('bot.tbn ' + NET_TKN_SYMBOL + ' balance  : ' + bot_net_balance[0] + ' ' + bot_net_balance[1])
 
-print('\nTotal ' + TKN_SYMBOL + ' balance    : ' + str(float(token_liquidity[0]) + float(bot_token_balance[0])) + ' ' + bot_token_balance[1])
-print('Total ' + NET_TKN_SYMBOL + ' balance    : ' + str(float(net_token_liquidity[0]) + float(bot_net_balance[0])) + ' ' + bot_net_balance[1])
+print('\nTotal ' + TKN_SYMBOL + ' balance    : ' + format(float(token_liquidity[0]) + float(bot_token_balance[0]), '.2f') + ' ' + bot_token_balance[1])
+print('Total ' + NET_TKN_SYMBOL + ' balance    : ' + format(float(net_token_liquidity[0]) + float(bot_net_balance[0]), '.4f') + ' ' + bot_net_balance[1])
 
 if price_delta > SPREAD/2.0:
     quantity = TRADE_QUANTITY
@@ -84,9 +87,9 @@ if price_delta > SPREAD/2.0:
     if  float(bot_net_balance[0]) > quantity:
         print('\n=>> Buy ' + format(quantity * bancor_price * 0.995, '.4f') + ' EZAR\n')
         stop_loss = round(0.98 * bancor_price * quantity, 6)
-        x = 'cleos --url ' + API + ' push action eosio.token transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' TLOS","1,zar.tbn EZAR,' + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
-#        print(x)
-        run(x)
+        cmd = 'cleos --url ' + API + ' push action eosio.token transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' TLOS","1,zar.tbn EZAR,' \
+              + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
+        run(cmd)
     else:
         print('\n=>> Insufficient funds, bot.tbn balance : ' + bot_net_balance[0] + ' ' + bot_net_balance[1] + '\n')
 else:
@@ -96,9 +99,9 @@ else:
         if  float(bot_token_balance[0]) > quantity:
             print('\n=>> Sell ' + quantity_str + ' EZAR')
             stop_loss = round(0.98 * quantity / bancor_price, 6)
-            x = 'cleos --url ' + API + ' push action stablecoin.z transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' EZAR","1,zar.tbn TLOS,' + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
-#            print(x)
-            run(x)
+            cmd = 'cleos --url ' + API + ' push action stablecoin.z transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' EZAR","1,zar.tbn TLOS,' \
+                  + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
+            run(cmd)
         else:
             print('\n=>> Insufficient funds, bot.tbn balance : ' + bot_token_balance[0] + ' ' + bot_token_balance[1] + '\n')
     else:
