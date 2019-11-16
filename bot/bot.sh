@@ -22,6 +22,7 @@ trade(){
     echo $LAST_TRADE_TIME > lastlog.txt
 
     ./trade.py
+    ./lock_wallet.sh
 
     echo
     echo "waiting for next trade..."
