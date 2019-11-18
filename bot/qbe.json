@@ -1,0 +1,7 @@
+{
+    "maxtrade":10.0000,
+    "market":"qubicletoken-qbe-tlos",
+    "converter":"qbe.tbn",
+    "contract":"qubicletoken",
+    "symbol":"QBE"
+}

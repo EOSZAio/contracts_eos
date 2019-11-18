@@ -22,10 +22,20 @@ trade(){
     echo $LAST_TRADE_TIME > lastlog.txt
 
     ./trade.py
-    ./lock_wallet.sh
 
+    # Newdex trading bot
+    sleep 2
+    ./newdex.py tlosdac.json
+    sleep 2
+    ./newdex.py qbe.json
+    sleep 2
+    ./newdex.py rev.json
+
+    ./lock_wallet.sh
     echo
     echo "waiting for next trade..."
+    echo
+    echo "=================================="
     sleep $LOG_INTERVAL
 
     trade ""

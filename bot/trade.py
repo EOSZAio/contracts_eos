@@ -12,7 +12,8 @@ import sys
 import requests
 
 URL = "https://api.coingecko.com/api/v3/simple/price"
-API = "https://api.telos.africa"
+API = "http://api.telos.africa"
+#API = "https://telosapi.eosmetal.io"
 PASSWORD="PW5HwwRqAM6dgEy2KwHRArxNgG28YAPAc9PXtbZncGT44re5jfNeW"
 
 ACCOUNT="bot.tbn"
@@ -66,12 +67,12 @@ bot_token_balance = get_currency_balance('bot.tbn', TKN_CONTRACT, TKN_SYMBOL)
 bancor_price = float(token_liquidity[0]) / float(net_token_liquidity[0])
 price_delta = (bancor_price - coingecko_price * PREMIUM) / coingecko_price * PREMIUM * 100.0
 
-print('CoinGecho price       : ' + str(coingecko_price))
-print('Bancor price          : ' + str(round(bancor_price, 4)))
+print('CoinGecho price       : ' + format(coingecko_price, '.4f') + ' R/TLOS')
+print('Bancor price          : ' + format(bancor_price, '.4f') + ' EZAR/TLOS')
 print('Price premium         : ' + str(round(100.0 * (PREMIUM - 1.0), 2)) + '%')
 
-print('\nPrice delta           : ' + str(round(price_delta, 2)) + '%')
-print('Price delta limit     : ' + str(SPREAD/2.0) + '%\n')
+print('\nPrice delta           : ' + format(price_delta, '.2f') + '%')
+print('Price delta limit     : ' + format(SPREAD/2.0, '.2f') + '%\n')
 
 print(TKN_SYMBOL + ' liquidity depth  : ' + token_liquidity[0] + ' ' + token_liquidity[1])
 print(NET_TKN_SYMBOL + ' liquidity depth  : ' + net_token_liquidity[0] + ' ' + net_token_liquidity[1])

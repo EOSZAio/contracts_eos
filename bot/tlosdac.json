@@ -1,0 +1,7 @@
+{
+    "maxtrade":10.0000,
+    "market":"telosdacdrop-tlosdac-tlos",
+    "converter":"dac.tbn",
+    "contract":"telosdacdrop",
+    "symbol":"TLOSDAC"
+}
