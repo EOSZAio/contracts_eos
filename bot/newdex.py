@@ -134,7 +134,7 @@ if market['code'] == 200:
             print('After trade      : ' + format(float(balance_after_newdex[0]), '.4f') + ' ' + balance_before_newdex[1])
             print('Receive          : ' + format(bancor_quantity, '.4f') + ' ' + balance_before_newdex[1])
 
-            stop_loss = round(0.98 * bancor_quantity, 6)
+            stop_loss = round(0.98 * get_bancor_result(bancor_quantity, float(tlos_liquidity[0]), float(other_liquidity[0]), 0.005), 6)
             cmd = 'cleos --url ' + API + ' push action ' + TLOS_CONTRACT + ' transfer \'["' + ACCOUNT + '","bancor.tbn","' \
                   + format(bancor_quantity, '.4f') + ' ' + TLOS_SYMBOL + '","1,' + CONVERTER + ' ' + available_funds[1] \
                   + ',' + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
@@ -205,7 +205,7 @@ if market['code'] == 200:
             print('After trade      : ' + format(float(balance_after_newdex[0]), '.4f') + ' ' + balance_before_newdex[1])
             print('Receive          : ' + format(bancor_quantity, '.4f') + ' ' + balance_before_newdex[1])
 
-            stop_loss = round(0.98 * bancor_quantity, 6)
+            stop_loss = round(0.98 * get_bancor_result(bancor_quantity, float(other_liquidity[0]), float(tlos_liquidity[0]), 0.005), 6)
             cmd = 'cleos --url ' + API + ' push action ' + OTHER_CONTRACT + ' transfer \'["' + ACCOUNT + '","bancor.tbn","' \
                   + format(bancor_quantity, '.4f') + ' ' + OTHER_SYMBOL + '","1,' + CONVERTER + ' ' + available_funds[1] \
                   + ',' + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
