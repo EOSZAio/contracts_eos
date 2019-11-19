@@ -12,9 +12,16 @@ import sys
 import requests
 
 URL = "https://api.coingecko.com/api/v3/simple/price"
+
+API = ""
 API = "http://api.telos.africa"
 #API = "https://telosapi.eosmetal.io"
 PASSWORD="PW5HwwRqAM6dgEy2KwHRArxNgG28YAPAc9PXtbZncGT44re5jfNeW"
+
+if API == '':
+    CLEOS = 'cleos '
+else:
+    CLEOS = 'cleos --url ' + API + ' '
 
 ACCOUNT="bot.tbn"
 CONVERTER="zar.tbn"
@@ -47,7 +54,7 @@ def get_price(s):
     return price
 
 def get_currency_balance(account, contract, symbol):
-    balance = get_output('cleos --url ' + API + ' get currency balance ' + contract + ' ' + account + ' ' + symbol).split()
+    balance = get_output(CLEOS + 'get currency balance ' + contract + ' ' + account + ' ' + symbol).split()
     if len(balance) == 0:
         balance[0] = '0.0'
         balance[1] = symbol
@@ -88,7 +95,7 @@ if price_delta > SPREAD/2.0:
     if  float(bot_net_balance[0]) > quantity:
         print('\n=>> Buy ' + format(quantity * bancor_price * 0.995, '.4f') + ' EZAR\n')
         stop_loss = round(0.98 * bancor_price * quantity, 6)
-        cmd = 'cleos --url ' + API + ' push action eosio.token transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' TLOS","1,zar.tbn EZAR,' \
+        cmd = CLEOS + 'push action eosio.token transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' TLOS","1,zar.tbn EZAR,' \
               + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
         run(cmd)
     else:
@@ -100,7 +107,7 @@ else:
         if  float(bot_token_balance[0]) > quantity:
             print('\n=>> Sell ' + quantity_str + ' EZAR')
             stop_loss = round(0.98 * quantity / bancor_price, 6)
-            cmd = 'cleos --url ' + API + ' push action stablecoin.z transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' EZAR","1,zar.tbn TLOS,' \
+            cmd = CLEOS + 'push action stablecoin.z transfer \'["' + ACCOUNT + '","bancor.tbn","' + quantity_str + ' EZAR","1,zar.tbn TLOS,' \
                   + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
             run(cmd)
         else:

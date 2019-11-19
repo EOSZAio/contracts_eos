@@ -10,8 +10,14 @@ import time
 # https://api.newdex.io/v1/depth?symbol=telosdacdrop-tlosdac-tlos
 URL = "https://api.newdex.io/v1/depth"
 
+#API = ""
 API = "http://api.telos.africa"
 #API = "https://telosapi.eosmetal.io"
+
+if API == '':
+    CLEOS = 'cleos '
+else:
+    CLEOS = 'cleos --url ' + API + ' '
 
 CONFIG="tlosdac.json"
 #CONFIG="qbe.json"
@@ -33,7 +39,7 @@ def get_output(args):
     return proc.communicate()[0].decode('utf-8')
 
 def get_currency_balance(account, contract, symbol):
-    balance = get_output('cleos --url ' + API + ' get currency balance ' + contract + ' ' + account + ' ' + symbol).split()
+    balance = get_output(CLEOS + 'get currency balance ' + contract + ' ' + account + ' ' + symbol).split()
     if len(balance) == 0:
         balance = ['0.0',symbol]
     return balance
@@ -118,11 +124,11 @@ if market['code'] == 200:
 
             # {"type":"sell-limit","symbol":"telosdacdrop-tlosdac-tlos","price":"0.00331","channel":"API"}
             order = '{\\"type\\":\\"sell-limit\\",\\"symbol\\":\\"' + MARKET + '\\",\\"price\\":\\"' + format(bid_price, '.5f') + '\\",\\"channel\\":\\"API\\"}'
-            cmd = 'cleos --url ' + API + ' push action '+OTHER_CONTRACT+' transfer \'["' + ACCOUNT + '","newdex","' \
+            cmd = CLEOS + 'push action '+OTHER_CONTRACT+' transfer \'["' + ACCOUNT + '","newdex","' \
                   + format(newdex_quantity, '.4f') + ' ' + OTHER_SYMBOL \
                   + '","' + str(order) + '"]\' -p ' + ACCOUNT + '@active'
             print(cmd)
-            if newdex_quantity > 0.0:
+            if newdex_quantity > 0.0010/bid_price:
                 run(cmd)
 
             time.sleep(10)
@@ -135,7 +141,7 @@ if market['code'] == 200:
             print('Receive          : ' + format(bancor_quantity, '.4f') + ' ' + balance_before_newdex[1])
 
             stop_loss = round(0.98 * get_bancor_result(bancor_quantity, float(tlos_liquidity[0]), float(other_liquidity[0]), 0.005), 6)
-            cmd = 'cleos --url ' + API + ' push action ' + TLOS_CONTRACT + ' transfer \'["' + ACCOUNT + '","bancor.tbn","' \
+            cmd = CLEOS + 'push action ' + TLOS_CONTRACT + ' transfer \'["' + ACCOUNT + '","bancor.tbn","' \
                   + format(bancor_quantity, '.4f') + ' ' + TLOS_SYMBOL + '","1,' + CONVERTER + ' ' + available_funds[1] \
                   + ',' + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
             print(cmd)
@@ -189,11 +195,11 @@ if market['code'] == 200:
             # {"type":"sell-limit","symbol":"telosdacdrop-tlosdac-tlos","price":"0.00331","channel":"API"}
             order = '{\\"type\\":\\"buy-limit\\",\\"symbol\\":\\"' + MARKET + '\\",\\"price\\":\\"' + format(ask_price, '.5f') + '\\",\\"channel\\":\\"API\\"}'
             print(order)
-            cmd = 'cleos --url ' + API + ' push action ' + TLOS_CONTRACT + ' transfer \'["' + ACCOUNT + '","newdex","' \
+            cmd = CLEOS + 'push action ' + TLOS_CONTRACT + ' transfer \'["' + ACCOUNT + '","newdex","' \
                   + format(newdex_quantity, '.4f') + ' ' + TLOS_SYMBOL \
                   + '","' + str(order) + '"]\' -p ' + ACCOUNT + '@active'
             print(cmd)
-            if newdex_quantity > 0.0:
+            if newdex_quantity > 0.0010:
                 run(cmd)
 
             time.sleep(10)
@@ -206,7 +212,7 @@ if market['code'] == 200:
             print('Receive          : ' + format(bancor_quantity, '.4f') + ' ' + balance_before_newdex[1])
 
             stop_loss = round(0.98 * get_bancor_result(bancor_quantity, float(other_liquidity[0]), float(tlos_liquidity[0]), 0.005), 6)
-            cmd = 'cleos --url ' + API + ' push action ' + OTHER_CONTRACT + ' transfer \'["' + ACCOUNT + '","bancor.tbn","' \
+            cmd = CLEOS + 'push action ' + OTHER_CONTRACT + ' transfer \'["' + ACCOUNT + '","bancor.tbn","' \
                   + format(bancor_quantity, '.4f') + ' ' + OTHER_SYMBOL + '","1,' + CONVERTER + ' ' + available_funds[1] \
                   + ',' + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
             print(cmd)
