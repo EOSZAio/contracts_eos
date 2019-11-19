@@ -32,7 +32,7 @@ PRESISION="00"
 TLOS_LIQUIDITY=1000.0000
 TOKEN_LIQUIDITY=1283.66
 SMART_LIQUIDITY=25000.00000000
-FEE=2000
+FEE=2500
 ```
 
 ### QBE
@@ -47,7 +47,7 @@ PRESISION="0000"
 TLOS_LIQUIDITY=579.6295
 TOKEN_LIQUIDITY=12500.0000
 SMART_LIQUIDITY=25000.00000000
-FEE=2000
+FEE=2500
 
 # Fund converter
 cleos $API push action qubicletoken transfer '[ "rorymapstone", "admin.tbn", "18000.0000 QBE", "Fund Bancor" ]' -p rorymapstone@active
@@ -66,7 +66,7 @@ PRESISION="0000"
 TLOS_LIQUIDITY=225.0000
 TOKEN_LIQUIDITY=90000.0000
 SMART_LIQUIDITY=25000.00000000
-FEE=2000
+FEE=2500
 
 # Fund converter
 cleos $API push action $TOKEN transfer '[ "rorymapstone", "admin.tbn", "90000.0000 TLOSDAC", "Fund Bancor" ]' -p rorymapstone@active
@@ -84,7 +84,7 @@ PRESISION="0000"
 TLOS_LIQUIDITY=10.0000
 TOKEN_LIQUIDITY=10.0000
 SMART_LIQUIDITY=10.00000000
-FEE=2000
+FEE=2500
 
 # Fund converter
 cleos $API push action eosio.token transfer '[ "admin.tbn", "tbn", "200.0000 TLOS", "Bancor contract accounts" ]' -p admin.tbn@active
@@ -103,6 +103,24 @@ TLOS_LIQUIDITY=1000.0000
 TOKEN_LIQUIDITY=10.0000
 SMART_LIQUIDITY=1000.00000000
 FEE=12000
+
+# Fund converter
+cleos $API push action eosio.token transfer '[ "admin.tbn", "tbn", "200.0000 TLOS", "Bancor contract accounts" ]' -p admin.tbn@active
+```
+
+### SQRL
+```bash
+NETWORK="bancor.tbn"
+NETWORK_TOKEN=TLOS
+TOKEN=sqrlwalletio
+CONVERTER_CODE=sql
+SYMBOL=SQRL
+PRESISION="0000"
+
+TLOS_LIQUIDITY=250.0000
+TOKEN_LIQUIDITY=50000.0000
+SMART_LIQUIDITY=500.00000000
+FEE=2500
 
 # Fund converter
 cleos $API push action eosio.token transfer '[ "admin.tbn", "tbn", "200.0000 TLOS", "Bancor contract accounts" ]' -p admin.tbn@active
@@ -163,7 +181,7 @@ cleos $API set account permission $NETWORK active '{ "threshold": 1, "keys": [{ 
 
 ## Converter
 ```bash
-cleos $API system newaccount tbn $CONVERTER $OWNER  $ACTIVE --stake-cpu "9.0000 TLOS" --stake-net "1.0000 TLOS" --buy-ram-kbytes 600 --transfer -p tbn@active
+cleos $API system newaccount tbn $CONVERTER $OWNER  $ACTIVE --stake-cpu "0.9000 TLOS" --stake-net "0.1000 TLOS" --buy-ram-kbytes 600 --transfer -p tbn@active
 cleos $API set contract $CONVERTER $MY_CONTRACTS_BUILD/BancorConverter -p ${CONVERTER}@active
 cleos $API set account permission $CONVERTER active '{ "threshold": 1, "keys": [{ "key": "'${ACTIVE}'", "weight": 1 }], "accounts": [{ "permission": { "actor":"'${CONVERTER}'","permission":"eosio.code" }, "weight":1 }] }' owner -p $CONVERTER@active
 ```
@@ -187,8 +205,8 @@ cleos $API push action $RELAY issue  '["'${CONVERTER}'", "'${SMART_LIQUIDITY}' '
 cleos $API push action $CONVERTER init '["'${RELAY}'", "0.00000000 '${SMART_TOKEN}'", 0, 1, "'${NETWORK}'", 0, 30000, '${FEE}']' -p $CONVERTER@active
 
 #    set reserves EZAR and TLOS for zar.tbn converter
-cleos $API push action $CONVERTER setreserve '["eosio.token", "0.0000 TLOS", 500000, 1]' -p $CONVERTER@active
-cleos $API push action $CONVERTER setreserve '["'${TOKEN}'", "0.'${PRESISION}' '${SYMBOL}'", 500000, 1]' -p $CONVERTER@active
+cleos $API push action $CONVERTER setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p $CONVERTER@active
+cleos $API push action $CONVERTER setreserve '["'${TOKEN}'", "4,'${SYMBOL}'", 500000, 1]' -p $CONVERTER@active
 ```
 
 ### Liquidity
@@ -237,7 +255,7 @@ cleos $API get currency balance $RELAY $ACCOUNT $SMART_TOKEN
 ```bash
 SMART_AMOUNT=0.10000000
 TLOS_AMOUNT=0.1000
-TOKEN_AMOUNT=0.10
+TOKEN_AMOUNT=20.0000
 
 # Funding to test
 cleos $API push action eosio.token transfer '[ "tbn", "admin.tbn", "10.0000 TLOS", "Fund Bancor" ]' -p tbn@active
@@ -249,6 +267,22 @@ cleos $API push action $RELAY transfer '["admin.tbn","'${NETWORK}'","'${SMART_AM
 cleos $API push action eosio.token transfer '["admin.tbn","'${NETWORK}'","'${TLOS_AMOUNT}' TLOS","1,'${CONVERTER}' '${SYMBOL}',0.0,admin.tbn"]' -p admin.tbn@active
 
 cleos $API push action $TOKEN transfer '["admin.tbn","'${NETWORK}'","'${TOKEN_AMOUNT}' '${SYMBOL}'","1,'${CONVERTER}' TLOS,0.0,admin.tbn"]' -p admin.tbn@active
+
+## Rebalance converters
+# 249.9008 TLOS => 0.0992 TLOS
+# 49980.1561 SQRL => 19.8439 SQRL
+# 499.80000000 TLOSSQL => 0.20000000 TLOSSQL
+SMART_LIQUIDITY=0.20000000
+
+cleos $API push action $RELAY issue  '["'${CONVERTER}'", "'${SMART_LIQUIDITY}' '${SMART_TOKEN}'", "setup"]' -p $CONVERTER@active
+cleos $API push action $RELAY transfer '["'${CONVERTER}'","admin.tbn","'${SMART_LIQUIDITY}' '${SMART_TOKEN}'","setup"]' -p $CONVERTER@active
+
+TOKEN_LIQUIDITY=19.8439
+TLOS_LIQUIDITY=0.0992
+cleos $API push action $TOKEN transfer '["admin.tbn","'${CONVERTER}'","'${TOKEN_LIQUIDITY}' '${SYMBOL}'","setup"]' -p admin.tbn@active
+cleos $API push action eosio.token transfer '["admin.tbn","'${CONVERTER}'","'${TLOS_LIQUIDITY}' TLOS","setup"]' -p admin.tbn@active
+
+
 ```
 
 ### Double hops
