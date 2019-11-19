@@ -127,6 +127,17 @@ CONTRACT BancorConverter : public eosio::contract {
         ACTION delreserve(symbol_code currency);
 
         /**
+         * @brief dummy action records conversion result
+         * @details called to recond conversion input and result in the action trace
+         * @param from - conversion input
+         * @param from_liquidity - conversion input liquidity pool
+         * @param to - conversion output
+         * @param to_liquidity - conversion input liquidity pool
+         * @param fee - conversion fee
+         */
+        ACTION result(name from_contract, asset from, asset from_liquidity, name to_contract, asset to, asset to_liquidity, asset fee, string memo);
+
+        /**
          * @brief transfer intercepts
          * @details memo is in csv format, values -
          * version          version number, currently 1

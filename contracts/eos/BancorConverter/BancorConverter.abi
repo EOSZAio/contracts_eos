@@ -74,6 +74,44 @@
             ]
         },
         {
+            "name": "result",
+            "base": "",
+            "fields": [
+                {
+                    "name": "from_contract",
+                    "type": "name"
+                },
+                {
+                    "name": "from",
+                    "type": "asset"
+                },
+                {
+                    "name": "from_liquidity",
+                    "type": "asset"
+                },
+                {
+                    "name": "to_contract",
+                    "type": "name"
+                },
+                {
+                    "name": "to",
+                    "type": "asset"
+                },
+                {
+                    "name": "to_liquidity",
+                    "type": "asset"
+                },
+                {
+                    "name": "fee",
+                    "type": "asset"
+                },
+                {
+                    "name": "memo",
+                    "type": "string"
+                }
+            ]
+        },
+        {
             "name": "setreserve",
             "base": "",
             "fields": [
@@ -165,6 +203,11 @@
         {
             "name": "init",
             "type": "init",
+            "ricardian_contract": ""
+        },
+        {
+            "name": "result",
+            "type": "result",
             "ricardian_contract": ""
         },
         {

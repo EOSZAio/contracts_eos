@@ -51,13 +51,25 @@ CONTRACT BancorNetwork : public eosio::contract {
         using transfer_action = action_wrapper<name("transfer"), &BancorNetwork::on_transfer>;
     
     private:
-        TABLE settings_t {
-            bool enabled;
-            uint64_t max_fee;
+//        TABLE settings_t {
+//            bool enabled;
+//            uint64_t max_fee;
             
+//            uint64_t primary_key() const { return "settings"_n.value; }
+//        };
+
+        TABLE settings_t {
+            name     smart_contract;
+            asset    smart_currency;
+            bool     smart_enabled;
+            bool     enabled;
+            name     network;
+            bool     require_balance;
+            uint64_t max_fee;
+            uint64_t fee;
+
             uint64_t primary_key() const { return "settings"_n.value; }
         };
-
 
 //        TABLE settings_t {
 //                  name     smart_contract;

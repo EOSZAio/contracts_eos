@@ -118,6 +118,10 @@ ACTION BancorConverter::delreserve(symbol_code currency) {
     reserves_table.erase(rsrv);
 }
 
+ACTION BancorConverter::result(name from_contract, eosio::asset from, eosio::asset from_liquidity, name to_contract, eosio::asset to, eosio::asset to_liquidity, eosio::asset fee, std::string memo) {
+    require_auth(get_self());
+}
+
 void BancorConverter::convert(name from, eosio::asset quantity, std::string memo, name code) {
     auto from_amount = quantity.amount / pow(10, quantity.symbol.precision());
 
@@ -226,6 +230,26 @@ void BancorConverter::convert(name from, eosio::asset quantity, std::string memo
     int64_t to_amount = (to_tokens * pow(10, to_currency_precision));
     auto new_asset = asset(to_amount, to_currency.symbol);
     name inner_to = converter_settings.network;
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------
+    // Dummy action to write conversion results to the action trace
+    // Fee
+    int64_t fee_amount = (fee * pow(10, to_currency_precision));
+    auto fee_asset = asset(fee_amount, to_currency.symbol);
+
+    // from liquidity
+    int64_t from_liquidity_amount = (incoming_smart_token) ? (current_smart_supply * pow(10, from_currency.symbol.precision())) : ((current_from_balance + from_amount) * pow(10, from_currency.symbol.precision()));
+    auto from_liquidity = asset(from_liquidity_amount, from_currency.symbol);
+
+    // to liquidity
+    int64_t to_liquidity_amount = (outgoing_smart_token) ? ((current_smart_supply) * pow(10, to_currency_precision)) : ((current_to_balance - to_tokens) * pow(10, to_currency_precision));
+    auto to_liquidity = asset(to_liquidity_amount, to_currency.symbol);
+
+    action( permission_level{ get_self(), "active"_n },
+            get_self(), "result"_n,
+            std::make_tuple(from_token.contract, quantity, from_liquidity, to_token.contract, new_asset, to_liquidity, fee_asset, memo)
+    ).send();
+    //-----------------------------------------------------------------------------------------------------------------------------------------------
 
     if (memo_object.path.size() == 0) {
         inner_to = final_to;
