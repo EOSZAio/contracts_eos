@@ -1,0 +1,7 @@
+{
+    "maxtrade":5.0000,
+    "market":"sqrlwalletio-sqrl-tlos",
+    "converter":"sql.tbn",
+    "contract":"sqrlwalletio",
+    "symbol":"SQRL"
+}
