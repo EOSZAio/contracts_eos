@@ -66,6 +66,7 @@ with open(CONFIG) as json_file:
     CONVERTER=data['converter']
     OTHER_CONTRACT=data['contract']
     OTHER_SYMBOL=data['symbol']
+    OTHER_FORMAT=data['format']
     MAX_TRADE=data['maxtrade']
     print("Configuration file : ",CONFIG)
     print("Configuration      : ",data)
@@ -106,16 +107,16 @@ if market['code'] == 200:
         print('\nNumber of bids   : ', str(l))
         print('Best bid         : ', best_bid)
         print('Price            : ', format(bid_price, '.5f') + ' ' + price_units)
-        print('Quantity         : ', format(bid_quantity, '.4f') + ' ' + OTHER_SYMBOL)
-        print('Newdex quantity  : ', format(newdex_quantity, '.4f') + ' ' + OTHER_SYMBOL)
+        print('Quantity         : ', format(bid_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
+        print('Newdex quantity  : ', format(newdex_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
         print('Newdex result    : ', format(newdex_result, '.4f') + ' ' + TLOS_SYMBOL)
 
-        print('\nConvert quantity : ', format(convert_quantity, '.4f') + ' ' + OTHER_SYMBOL)
+        print('\nConvert quantity : ', format(convert_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
         print('Convert price    : ', format(convert_price, '.5f') + ' ' + price_units)
 
-        print('\nTrade            : ' + format(newdex_quantity, '.4f') + ' ' + OTHER_SYMBOL)
-        print('Receive          : ' + format(convert_quantity, '.4f') + ' ' + OTHER_SYMBOL)
-        print('Net gain         : ' + format(net_result, '.4f') + ' ' + OTHER_SYMBOL)
+        print('\nTrade            : ' + format(newdex_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
+        print('Receive          : ' + format(convert_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
+        print('Net gain         : ' + format(net_result, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
         if net_result > 0:
             print('\n>>>>>>>> Viable trade <<<<<<<<')
             available_funds = get_currency_balance(ACCOUNT, OTHER_CONTRACT, OTHER_SYMBOL)
@@ -125,7 +126,7 @@ if market['code'] == 200:
             # {"type":"sell-limit","symbol":"telosdacdrop-tlosdac-tlos","price":"0.00331","channel":"API"}
             order = '{\\"type\\":\\"sell-limit\\",\\"symbol\\":\\"' + MARKET + '\\",\\"price\\":\\"' + format(bid_price, '.5f') + '\\",\\"channel\\":\\"API\\"}'
             cmd = CLEOS + 'push action '+OTHER_CONTRACT+' transfer \'["' + ACCOUNT + '","newdex","' \
-                  + format(newdex_quantity, '.4f') + ' ' + OTHER_SYMBOL \
+                  + format(newdex_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL \
                   + '","' + str(order) + '"]\' -p ' + ACCOUNT + '@active'
             print(cmd)
             if newdex_quantity > 0.0010/bid_price:
@@ -176,9 +177,9 @@ if market['code'] == 200:
         print('\nNumber of asks   : ', str(l))
         print('Best ask         : ', best_ask)
         print('Price            : ', format(ask_price, '.5f') + ' ' + price_units)
-        print('Quantity         : ', format(ask_quantity, '.4f') + ' ' + OTHER_SYMBOL)
+        print('Quantity         : ', format(ask_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
         print('Newdex quantity  : ', format(newdex_quantity, '.4f') + ' ' + TLOS_SYMBOL)
-        print('Newdex result    : ', format(newdex_result, '.4f') + ' ' + OTHER_SYMBOL)
+        print('Newdex result    : ', format(newdex_result, OTHER_FORMAT) + ' ' + OTHER_SYMBOL)
 
         print('\nConvert quantity : ', format(convert_quantity, '.4f') + ' ' + TLOS_SYMBOL)
         print('Convert price    : ', format(convert_price, '.5f') + ' ' + price_units)
@@ -213,7 +214,7 @@ if market['code'] == 200:
 
             stop_loss = round(0.98 * get_bancor_result(bancor_quantity, float(other_liquidity[0]), float(tlos_liquidity[0]), 0.005), 6)
             cmd = CLEOS + 'push action ' + OTHER_CONTRACT + ' transfer \'["' + ACCOUNT + '","bancor.tbn","' \
-                  + format(bancor_quantity, '.4f') + ' ' + OTHER_SYMBOL + '","1,' + CONVERTER + ' ' + available_funds[1] \
+                  + format(bancor_quantity, OTHER_FORMAT) + ' ' + OTHER_SYMBOL + '","1,' + CONVERTER + ' ' + available_funds[1] \
                   + ',' + str(stop_loss) + ',' + ACCOUNT + '"]\' -p ' + ACCOUNT + '@active'
             print(cmd)
             if bancor_quantity > 0.0:

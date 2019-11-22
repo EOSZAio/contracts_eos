@@ -3,5 +3,6 @@
     "market":"sqrlwalletio-sqrl-tlos",
     "converter":"sql.tbn",
     "contract":"sqrlwalletio",
-    "symbol":"SQRL"
+    "symbol":"SQRL",
+    "format": ".4f"
 }

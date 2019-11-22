@@ -3,5 +3,6 @@
     "market":"qubicletoken-qbe-tlos",
     "converter":"qbe.tbn",
     "contract":"qubicletoken",
-    "symbol":"QBE"
+    "symbol":"QBE",
+    "format": ".4f"
 }

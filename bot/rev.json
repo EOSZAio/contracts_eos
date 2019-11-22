@@ -3,5 +3,6 @@
     "market":"revelation21-heart-tlos",
     "converter":"rev.tbn",
     "contract":"revelation21",
-    "symbol":"HEART"
+    "symbol":"HEART",
+    "format": ".4f"
 }

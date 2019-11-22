@@ -32,6 +32,8 @@ trade(){
     ./newdex.py rev.json
     sleep 2
     ./newdex.py sqrl.json
+    sleep 2
+    ./newdex.py sand.json
 
     ./lock_wallet.sh
     echo

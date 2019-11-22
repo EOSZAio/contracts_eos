@@ -126,6 +126,39 @@ FEE=2500
 cleos $API push action eosio.token transfer '[ "admin.tbn", "tbn", "200.0000 TLOS", "Bancor contract accounts" ]' -p admin.tbn@active
 ```
 
+### SAND
+```bash
+NETWORK="bancor.tbn"
+NETWORK_TOKEN=TLOS
+TOKEN=sandiegocoin
+CONVERTER_CODE=san
+SYMBOL=SAND
+PRESISION="00000000"
+PRESISION_COUNT=8
+
+TLOS_LIQUIDITY=250.0000
+TOKEN_LIQUIDITY=2500.00000000
+SMART_LIQUIDITY=500.00000000
+FEE=2500
+
+
+# Fund converter
+cleos $API push action eosio.token transfer '[ "admin.tbn", "tbn", "100.0000 TLOS", "Bancor contract accounts" ]' -p admin.tbn@active
+
+# Fix error
+./scripts/eos/compile.sh eosio-cpp
+cleos $API set contract $CONVERTER $MY_CONTRACTS_BUILD/BancorConverter -p ${CONVERTER}@active
+cleos $API push action $CONVERTER setreserve '["'${TOKEN}'", "'${PRESISION_COUNT}','${SYMBOL}'", 500000, 1]' -p $CONVERTER@active
+./scripts/eos/compile.sh eosio-cpp
+cleos $API set contract $CONVERTER $MY_CONTRACTS_BUILD/BancorConverter -p ${CONVERTER}@active
+
+# 2499.00819102
+TOKEN_LIQUIDITY=0.99180898
+# 249.9008
+TLOS_LIQUIDITY=0.0992
+cleos $API push action $TOKEN transfer '["admin.tbn","'${CONVERTER}'","'${TOKEN_LIQUIDITY}' '${SYMBOL}'","setup"]' -p admin.tbn@active
+cleos $API push action eosio.token transfer '["admin.tbn","'${CONVERTER}'","'${TLOS_LIQUIDITY}' TLOS","setup"]' -p admin.tbn@active
+```
 
 ### Deployment
 ```bash
@@ -188,7 +221,7 @@ cleos $API set account permission $CONVERTER active '{ "threshold": 1, "keys": [
 
 ## Relay
 ```bash
-cleos $API system newaccount tbn $RELAY $OWNER  $ACTIVE --stake-cpu "9.0000 TLOS" --stake-net "1.0000 TLOS" --buy-ram-kbytes 300 --transfer -p tbn@active
+cleos $API system newaccount tbn $RELAY $OWNER  $ACTIVE --stake-cpu "0.9000 TLOS" --stake-net "0.1000 TLOS" --buy-ram-kbytes 300 --transfer -p tbn@active
 cleos $API set contract $RELAY $MY_CONTRACTS_BUILD/Token -p ${RELAY}@active
 cleos $API set account permission $RELAY active '{ "threshold": 1, "keys": [{ "key": "'${ACTIVE}'", "weight": 1 }], "accounts": [{ "permission": { "actor":"'${RELAY}'","permission":"eosio.code" }, "weight":1 }] }' owner -p $RELAY@active
 ```
@@ -206,7 +239,7 @@ cleos $API push action $CONVERTER init '["'${RELAY}'", "0.00000000 '${SMART_TOKE
 
 #    set reserves EZAR and TLOS for zar.tbn converter
 cleos $API push action $CONVERTER setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p $CONVERTER@active
-cleos $API push action $CONVERTER setreserve '["'${TOKEN}'", "4,'${SYMBOL}'", 500000, 1]' -p $CONVERTER@active
+cleos $API push action $CONVERTER setreserve '["'${TOKEN}'", "'${PRESISION_COUNT}','${SYMBOL}'", 500000, 1]' -p $CONVERTER@active
 ```
 
 ### Liquidity
@@ -255,14 +288,14 @@ cleos $API get currency balance $RELAY $ACCOUNT $SMART_TOKEN
 ```bash
 SMART_AMOUNT=0.10000000
 TLOS_AMOUNT=0.1000
-TOKEN_AMOUNT=20.0000
+TOKEN_AMOUNT=1.00000000
 
 # Funding to test
 cleos $API push action eosio.token transfer '[ "tbn", "admin.tbn", "10.0000 TLOS", "Fund Bancor" ]' -p tbn@active
 
-cleos $API push action $RELAY transfer '["admin.tbn","'${NETWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
+cleos $API push action $RELAY transfer '["admin.tbn","'${NETWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' TLOS,0.0,admin.tbn"]' -p admin.tbn@active
 
-cleos $API push action $RELAY transfer '["admin.tbn","'${NETWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' '${SYMBOL}',0.00000010,admin.tbn"]' -p admin.tbn@active
+cleos $API push action $RELAY transfer '["admin.tbn","'${NETWORK}'","'${SMART_AMOUNT}' '${SMART_TOKEN}'","1,'${CONVERTER}' '${SYMBOL}',0.0,admin.tbn"]' -p admin.tbn@active
 
 cleos $API push action eosio.token transfer '["admin.tbn","'${NETWORK}'","'${TLOS_AMOUNT}' TLOS","1,'${CONVERTER}' '${SYMBOL}',0.0,admin.tbn"]' -p admin.tbn@active
 
