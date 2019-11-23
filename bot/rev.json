@@ -1,8 +1,10 @@
 {
     "maxtrade":0.5000,
+    "mmtrade":0.0200,
     "market":"revelation21-heart-tlos",
     "converter":"rev.tbn",
     "contract":"revelation21",
     "symbol":"HEART",
-    "format": ".4f"
+    "precision": 4,
+    "price_precision": 5
 }

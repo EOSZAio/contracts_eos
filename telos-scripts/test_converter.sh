@@ -9,7 +9,6 @@ clear
 # ZAR  0.687    11939.56
 # KSH  0.0097   845616.49
 
-
 # ./test_converter.sh btc 00000000 EBTC
 # Converter code : " btc
 # Token symbol   : " EBTC

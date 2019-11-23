@@ -128,9 +128,11 @@ echo
 sleep 1
 echo -e "${CYAN}--------------setup converters and transfer tokens---------------${NC}"
 #    initialize the converters
+echo -e "${GREEN} ### zar.tbn init ### ${NC}"
 cleos push action zar.tbn init '["zarrelay.tbn", "0.00000000 TLOSZAR", 0, 1, "bancor.tbn", 0, 30000, 0]' -p zar.tbn@active
 
 #    set reserves eos and bnt for bntzar relay
+echo -e "${GREEN} ### zar.tbn setreserve ${NC} ###"
 cleos push action zar.tbn setreserve '["eosio.token", "4,TLOS", 500000, 1]' -p zar.tbn@active
 cleos push action zar.tbn setreserve '["stablecoin.z", "2,EZAR", 500000, 1]' -p zar.tbn@active
 
@@ -138,18 +140,29 @@ echo
 sleep 1
 echo -e "${CYAN}-------------transfer ezar to admin.tbn and converter------------${NC}"
 cleos push action stablecoin.z transfer '["zartknissuer","admin.tbn","1000.00 EZAR","setup"]' -p zartknissuer@active
-cleos push action stablecoin.z transfer '["zartknissuer","zar.tbn","126109.17 EZAR","setup"]' -p zartknissuer@active
+echo -e "${GREEN} ### zar.tbn transfer EZAR reserve ### ${NC}"
+#cleos push action stablecoin.z transfer '["zartknissuer","zar.tbn","126109.17 EZAR","setup"]' -p zartknissuer@active
+cleos push action stablecoin.z transfer '["zartknissuer","zar.tbn","125000.00 EZAR","setup"]' -p zartknissuer@active
 
 echo
 sleep 1
 echo -e "${CYAN}--------------transfer TLOS to user1 and converters---------------${NC}"
 cleos push action eosio.token transfer '["eosio","admin.tbn","200000.0000 TLOS","setup"]' -p eosio@active
+echo -e "${GREEN} ### zar.tbn transfer TLOS reserve ### ${NC}"
 cleos push action eosio.token transfer '["admin.tbn","zar.tbn","100000.0000 TLOS","setup"]' -p admin.tbn@active
 
 echo
 sleep 1
 echo -e "${CYAN}---------------transfer BNTTLOS and BNTSYS to user1---------------${NC}"
+echo -e "${GREEN} ### zar.tbn issue TLOSZAR ### ${NC}"
 cleos push action zarrelay.tbn transfer '["zar.tbn","admin.tbn","100.00000000 TLOSZAR","setup"]' -p zar.tbn@active
+
+echo
+sleep 1
+echo -e "${CYAN}----------------------update to include fee----------------------${NC}"
+#    initialize the converters
+echo -e "${GREEN} ### zar.tbn update ### ${NC}"
+cleos push action zar.tbn update '[1, 1, 0, 30000, 2500]' -p zar.tbn@active
 
 echo
 

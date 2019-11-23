@@ -66,7 +66,10 @@ with open(CONFIG) as json_file:
     CONVERTER=data['converter']
     OTHER_CONTRACT=data['contract']
     OTHER_SYMBOL=data['symbol']
-    OTHER_FORMAT=data['format']
+    OTHER_PRECISION=data['precision']
+    OTHER_FORMAT='.'+str(OTHER_PRECISION)+'f'
+    PRICE_PRECISION=data['price_precision']
+    PRICE_FORMAT='.'+str(PRICE_PRECISION)+'f'
     MAX_TRADE=data['maxtrade']
     print("Configuration file : ",CONFIG)
     print("Configuration      : ",data)
@@ -148,7 +151,6 @@ if market['code'] == 200:
             print(cmd)
             if bancor_quantity > 0.0:
                 run(cmd)
-
         else:
             print('\n>>>>>>>>> Not viable <<<<<<<<<')
 
@@ -219,7 +221,6 @@ if market['code'] == 200:
             print(cmd)
             if bancor_quantity > 0.0:
                 run(cmd)
-
         else:
             print('\n>>>>>>>>> Not viable <<<<<<<<<')
 

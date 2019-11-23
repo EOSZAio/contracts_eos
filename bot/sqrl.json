@@ -1,8 +1,10 @@
 {
     "maxtrade":5.0000,
+    "mmtrade":7.5000,
     "market":"sqrlwalletio-sqrl-tlos",
     "converter":"sql.tbn",
     "contract":"sqrlwalletio",
     "symbol":"SQRL",
-    "format": ".4f"
+    "precision": 4,
+    "price_precision": 4
 }

@@ -93,12 +93,20 @@ echo -e "${CYAN}-----trying to sell relays with 'smart_enabled' set to true-----
 echo -e "${CYAN}----------------------should not throw (TLOS)---------------------${NC}"
 echo
 echo -e "${CYAN}---------------------------TLOSZAR=>TLOS---------------------------${NC}"
-cleos push action zarrelay.tbn transfer '["admin.tbn","bancor.tbn","1.00000000 TLOSZAR","1,zar.tbn TLOS,0.00000010,admin.tbn"]' -p admin.tbn@active
+cleos push action zarrelay.tbn transfer '["admin.tbn","bancor.tbn","1.00000000 TLOSZAR","1,zar.tbn TLOS,0.00000000,admin.tbn"]' -p admin.tbn@active
+
+echo
+echo -e "${CYAN}---------------------------TLOS=>TLOSZAR---------------------------${NC}"
+cleos push action eosio.token transfer '["admin.tbn","bancor.tbn","10.0000 TLOS","1,zar.tbn TLOSZAR,0.0000,admin.tbn"]' -p admin.tbn@active
 
 echo
 sleep 1
 echo -e "${CYAN}---------------------------TLOSZAR=>EZAR---------------------------${NC}"
 cleos push action zarrelay.tbn transfer '["admin.tbn","bancor.tbn","1.00000000 TLOSZAR","1,zar.tbn EZAR,0.00000010,admin.tbn"]' -p admin.tbn@active
+
+echo
+echo -e "${CYAN}---------------------------EZAR=>TLOSZAR---------------------------${NC}"
+cleos push action stablecoin.z transfer '["admin.tbn","bancor.tbn","10.00 EZAR","1,zar.tbn TLOSZAR,0.0000,admin.tbn"]' -p admin.tbn@active
 
 echo
 sleep 1
