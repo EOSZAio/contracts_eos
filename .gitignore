@@ -14,7 +14,7 @@ node_modules/
 
 bot/
 telos-scripts/
-worker_proposal/
+worker-proposal/
 tbn-deployment/
 
 *.wasm
