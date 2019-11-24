@@ -12,4 +12,9 @@ node_modules/
 
 .idea/
 
+bot/
+telos-scripts/
+worker_proposal/
+tbn-deployment/
+
 *.wasm
