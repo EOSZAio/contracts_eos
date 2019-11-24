@@ -23,7 +23,11 @@ ACTION MultiConverter::create(name owner, asset initial_supply, asset maximum_su
     
     converters_table.emplace(owner, [&](auto& c) {
         c.currency = initial_supply.symbol;
-        c.owner    = owner;
+        c.owner = owner;
+        c.enabled = false;
+        c.launched = false;
+        c.stake_enabled = false;
+        c.fee = 0;
     });    
 
     action( 
@@ -49,9 +53,9 @@ ACTION MultiConverter::setenabled(bool enabled) {
     require_auth(get_self());
     settings settings_table(get_self(), get_self().value);
     const auto& st = settings_table.get("settings"_n.value, "set token contract first");
-    check(enabled != st.enabled, "setting same value as before");
+    check(enabled != st.active, "setting same value as before");
     settings_table.modify(st, same_payer, [&](auto& s) {		
-        s.enabled = enabled;
+        s.active = enabled;
     });
 }
 
@@ -70,7 +74,7 @@ ACTION MultiConverter::setmaxfee(uint64_t maxfee) {
 }
 
 ACTION MultiConverter::setstaking(name staking) {
-    is_account(staking);
+    check(is_account(staking), "invalid staking account");
     require_auth(get_self());    
     
     settings settings_table(get_self(), get_self().value);
@@ -84,7 +88,7 @@ ACTION MultiConverter::setstaking(name staking) {
 }
 
 ACTION MultiConverter::setmultitokn(name multi_token) {   
-    is_account(multi_token);
+    check(is_account(multi_token), "invalid multi-token account");
     require_auth(get_self());
 
     settings settings_table(get_self(), get_self().value);
@@ -93,6 +97,7 @@ ACTION MultiConverter::setmultitokn(name multi_token) {
     check(st == settings_table.end(), "can only call setmultitokn once");
     
     settings_table.emplace(get_self(), [&](auto& s) {		
+        s.active = false;
         s.multi_token = multi_token;
     });
 }
@@ -141,15 +146,15 @@ ACTION MultiConverter::enablestake(symbol_code currency, bool enabled) {
     });
 }
 
-ACTION MultiConverter::updateowner(symbol_code currency, name owner) {
+ACTION MultiConverter::updateowner(symbol_code currency, name new_owner) {
     converters converters_table(get_self(), currency.raw());
     const auto& converter = converters_table.get(currency.raw(), "converter does not exist");
 
     require_auth(converter.owner);
-    check(is_account(owner), "new owner is not an account");
-    check(owner != converter.owner, "setting same owner as before");
+    check(is_account(new_owner), "new owner is not an account");
+    check(new_owner != converter.owner, "setting same owner as before");
     converters_table.modify(converter, same_payer, [&](auto& c) {
-        c.owner = owner;
+        c.owner = new_owner;
     });   
 }
 
@@ -242,8 +247,8 @@ ACTION MultiConverter::close(symbol_code converter_currency_code) {
     converters_table.erase(converter);
 }
 
-ACTION MultiConverter::fund(name owner, asset quantity) {
-    require_auth(owner);
+ACTION MultiConverter::fund(name sender, asset quantity) {
+    require_auth(sender);
     check(quantity.is_valid() && quantity.amount > 0, "invalid quantity");
     
     settings settings_table(get_self(), get_self().value);
@@ -258,15 +263,15 @@ ACTION MultiConverter::fund(name owner, asset quantity) {
     double total_ratio = 0.0;
     auto smart_amount = quantity.amount / pow(10, quantity.symbol.precision());
     auto current_smart_supply = supply.amount / pow(10, quantity.symbol.precision());
-    
+
     for (auto& reserve : reserves_table) {
         total_ratio += reserve.ratio;
         auto balance = reserve.balance.amount / pow(10, reserve.balance.symbol.precision());
         uint64_t amount = (smart_amount * balance - 1) / current_smart_supply + 1;
         amount *= pow(10, reserve.balance.symbol.precision());
         asset liq = asset(amount, reserve.balance.symbol);
-        
-        mod_account_balance(owner, quantity.symbol.code(), -liq);
+            
+        mod_account_balance(sender, quantity.symbol.code(), -liq);
         mod_reserve_balance(quantity.symbol, liq);
     }
     check(total_ratio == MAX_RATIO, "total ratio must add up to 100%");
@@ -278,11 +283,11 @@ ACTION MultiConverter::fund(name owner, asset quantity) {
     action(
         permission_level{ get_self(), "active"_n },
         st.multi_token, "transfer"_n,
-        make_tuple(get_self(), owner, quantity, string("fund"))
+        make_tuple(get_self(), sender, quantity, string("fund"))
     ).send();
 }
 
-void MultiConverter::liquidate(name owner, asset quantity) {
+void MultiConverter::liquidate(name sender, asset quantity) {
     settings settings_table(get_self(), get_self().value);
     const auto& st = settings_table.get("settings"_n.value, "settings do not exist");
     check(get_first_receiver() == st.multi_token, "bad origin for this transfer");
@@ -306,7 +311,7 @@ void MultiConverter::liquidate(name owner, asset quantity) {
         action(
             permission_level{ get_self(), "active"_n },
             reserve.contract, "transfer"_n,
-            make_tuple(get_self(), owner, liq, string("liquidation"))
+            make_tuple(get_self(), sender, liq, string("liquidation"))
         ).send();   
     }
     check(total_ratio == MAX_RATIO, "total ratio must add up to 100%");
@@ -317,14 +322,14 @@ void MultiConverter::liquidate(name owner, asset quantity) {
     ).send();
 }
 
-ACTION MultiConverter::withdraw(name owner, asset quantity, symbol_code converter_currency_code) {
-    require_auth(owner);
+ACTION MultiConverter::withdraw(name sender, asset quantity, symbol_code converter_currency_code) {
+    require_auth(sender);
     check(quantity.is_valid() && quantity.amount > 0, "invalid quantity");
-    modreserve(owner, -quantity, converter_currency_code, get_self(), true);
+    mod_balances(sender, -quantity, converter_currency_code, get_self());
 }
 
-void MultiConverter::mod_account_balance(name owner, symbol_code converter_currency_code, asset quantity) {
-    accounts acnts(get_self(), owner.value);
+void MultiConverter::mod_account_balance(name sender, symbol_code converter_currency_code, asset quantity) {
+    accounts acnts(get_self(), sender.value);
     auto key = _by_cnvrt(quantity, converter_currency_code);
     auto index = acnts.get_index<"bycnvrt"_n >();
     auto itr = index.find(key);
@@ -332,42 +337,44 @@ void MultiConverter::mod_account_balance(name owner, symbol_code converter_curre
     uint64_t balance = quantity.amount;
     if (quantity.amount < 0) {
         check(exists, "cannot withdraw non-existant deposit");
-        check(itr->balance >= -quantity, "insufficient balance");
+        check(itr->quantity >= -quantity, "insufficient balance");
     }
     if (exists) {
         index.modify(itr, same_payer, [&](auto& acnt) {
-            acnt.balance += quantity;
+            acnt.quantity += quantity;
         });
         if (itr->is_empty()) 
             index.erase(itr);    
     } else 
         acnts.emplace(get_self(), [&](auto& acnt) {
-            acnt.currency = converter_currency_code;
-            acnt.balance = quantity;
+            acnt.symbl = converter_currency_code;
+            acnt.quantity = quantity;
             acnt.id = acnts.available_primary_key();
         });
 }
 
-void MultiConverter::modreserve(name owner, asset quantity, symbol_code converter_currency_code, name code, bool setup) {
+void MultiConverter::mod_balances(name sender, asset quantity, symbol_code converter_currency_code, name code) {
     reserves reserves_table(get_self(), converter_currency_code.raw());
     const auto& reserve = reserves_table.get(quantity.symbol.code().raw(), "reserve doesn't exist");
 
     converters converters_table(get_self(), converter_currency_code.raw());
     const auto& converter = converters_table.get(converter_currency_code.raw(), "converter does not exist");
-    check((!setup && converter.enabled) || !converter.launched, "converter was launched, or must be enabled");
 
     if (quantity.amount > 0)
         check(code == reserve.contract, "wrong origin contract for quantity");
-    else if (setup) // if quantity < 0 && setup == true
+    else
         action(
             permission_level{ get_self(), "active"_n },
             reserve.contract, "transfer"_n,
-            make_tuple(get_self(), owner, -quantity, string("withdrawal"))
+            make_tuple(get_self(), sender, -quantity, string("withdrawal"))
         ).send();
-    if (setup)
+    
+    if (converter.launched)
+        mod_account_balance(sender, converter_currency_code, quantity);
+    else {
+        check(sender == converter.owner, "only converter owner may fund/withdraw prior to activation");
         mod_reserve_balance(converter.currency, quantity);
-
-    mod_account_balance(owner, converter_currency_code, quantity);
+    }
 }
 
 void MultiConverter::mod_reserve_balance(symbol converter_currency, asset value) {
@@ -401,7 +408,7 @@ void MultiConverter::convert(name from, asset quantity, string memo, name code) 
     converters converters_table(get_self(), converter_currency_code.raw());
     const auto& converter = converters_table.get(converter_currency_code.raw(), "converter does not exist");
     
-    check(settings.enabled && converter.enabled, "conversions are disabled");
+    check(settings.active && converter.enabled, "conversions are disabled");
     check(from == BANCOR_NETWORK, "converter can only receive from network contract");
     check(memo_object.converters[0].account == get_self(), "wrong converter");
     
@@ -493,12 +500,12 @@ void MultiConverter::convert(name from, asset quantity, string memo, name code) 
         EMIT_PRICE_DATA_EVENT(converter_currency_code, formatted_smart_supply, 
                               to_token.contract, to_symbol.code(), 
                               current_to_balance - to_tokens, (to_ratio / MAX_RATIO));  
-                             
+
     path new_path = memo_object.path;
     new_path.erase(new_path.begin(), new_path.begin() + 2);
     memo_object.path = new_path;
-
-    auto new_memo = build_memo(memo_object);
+    
+    auto new_memo = build_memo(memo_object);                         
     
     uint64_t to_amount = to_tokens * pow(10, to_symbol.precision());
     auto new_asset = asset(to_amount, to_symbol);
@@ -523,16 +530,6 @@ void MultiConverter::convert(name from, asset quantity, string memo, name code) 
         to_contract, "transfer"_n,
         make_tuple(get_self(), inner_to, new_asset, new_memo)
     ).send();
-}
-
-void MultiConverter::verify_entry(name account, name currency_contract, symbol currency) {
-    Token::accounts accountstable(currency_contract, account.value);
-    auto ac = accountstable.find(currency.code().raw());
-    check(ac != accountstable.end(), "must have entry for token (claim token first)");
-}
-
-double MultiConverter::calculate_fee(double amount, uint64_t fee, uint8_t magnitude) {
-    return amount * (1 - pow((1 - fee / MAX_FEE), magnitude));
 }
 
  // returns a reserve object
@@ -562,10 +559,21 @@ asset MultiConverter::get_supply(name contract, symbol_code sym) {
     return st.supply;
 }
 
+// asserts if the supplied account doesn't have an entry for a given token
+void MultiConverter::verify_entry(name account, name currency_contract, symbol currency) {
+    Token::accounts accountstable(currency_contract, account.value);
+    auto ac = accountstable.find(currency.code().raw());
+    check(ac != accountstable.end(), "must have entry for token (claim token first)");
+}
+
+double MultiConverter::calculate_fee(double amount, uint64_t fee, uint8_t magnitude) {
+    return amount * (1 - pow((1 - fee / MAX_FEE), magnitude));
+}
+
 // asserts if a conversion resulted in an amount lower than the minimum amount defined by the caller
 void MultiConverter::verify_min_return(asset quantity, string min_return) {
-	float ret = stof(min_return.c_str());
-    int64_t ret_amount = ret * pow(10, quantity.symbol.precision());
+    float ret = stof(min_return.c_str());
+    int64_t ret_amount = (ret * pow(10, quantity.symbol.precision()));
     check(quantity.amount >= ret_amount, "below min return");
 }
 
@@ -601,38 +609,37 @@ double MultiConverter::quick_convert(double balance, double in, double toBalance
 
 float MultiConverter::stof(const char* s) {
     float rez = 0, fact = 1;
+    
     if (*s == '-') {
         s++;
         fact = -1;
     }
-
     for (int point_seen = 0; *s; s++) {
         if (*s == '.') {
+            if (point_seen) return 0;
             point_seen = 1; 
             continue;
         }
-
         int d = *s - '0';
         if (d >= 0 && d <= 9) {
             if (point_seen) fact /= 10.0f;
             rez = rez * 10.0f + (float)d;
-        }
+        } else return 0;
     }
-
     return rez * fact;
-};
+}
 
 void MultiConverter::on_transfer(name from, name to, asset quantity, string memo) {    
-     // avoid unstaking and system contract ops mishaps
+    require_auth(from);
+    // avoid unstaking and system contract ops mishaps
     if (to != get_self() || from == get_self() || 
         from == "eosio.ram"_n || from == "eosio.stake"_n || from == "eosio.rex"_n) return;
+
+    check(quantity.is_valid() && quantity.amount > 0, "invalid quantity");
     
     const auto& splitted_memo = split(memo, ";"); 
-    
-    if (splitted_memo[0] == "setup")
-        modreserve(from, quantity, symbol_code(splitted_memo[1]), get_first_receiver(), true);
-    else if (splitted_memo[0] == "fund")
-        modreserve(from, quantity, symbol_code(splitted_memo[1]), get_first_receiver(), false);
+    if (splitted_memo[0] == "fund")
+        mod_balances(from, quantity, symbol_code(splitted_memo[1]), get_first_receiver());
     else if (splitted_memo[0] == "liquidate")
         liquidate(from, quantity);
     
