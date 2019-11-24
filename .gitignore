@@ -12,6 +12,7 @@ node_modules/
 
 .idea/
 
-telos-scripts/nodeos/
+telos-scripts
+bot
 
 *.wasm
