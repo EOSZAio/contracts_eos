@@ -133,7 +133,7 @@ describe('Test: BancorNetwork', () => {
         assert.equal(priceDataEvent.reserve_ratio, 0.5, "unexpected reserve_ratio")
         assert.isAtMost(delta, tolerance, "bad return from event - bnt")
 
-        events = res.processed.action_traces[0].inline_traces[2].inline_traces[2].inline_traces[2].inline_traces[1].console.split("\n")
+        events = res.processed.action_traces[0].inline_traces[2].inline_traces[3].inline_traces[2].inline_traces[1].console.split("\n")
         convertEvent = JSON.parse(events[0])
         priceDataEvent = JSON.parse(events[2])
         
